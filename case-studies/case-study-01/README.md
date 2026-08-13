@@ -109,6 +109,14 @@ Highest average salary department: IT 68500.0 Kc
 
 ---
 
+## Zdrojový kód
+
+Celá analýza je vytvořena v Pythonu bez použití externích analytických knihoven. Výpočty jsou provedeny pomocí základních Python konstrukcí, jako jsou listy, dictionaries, cykly, podmínky a vestavěné funkce.
+
+➡️ [Zobrazit Python kód](./employee_salary_analysis.py)
+
+---
+
 ## Co jsem si na projektu procvičil
 
 Na této case study jsem si procvičil přechod od jednotlivých základů Pythonu k jednoduché analytické úloze nad jedním datasetem.
