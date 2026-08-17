@@ -111,6 +111,90 @@ Důležité:
 
 > `return` funkci nespouští. Funkci spouštíme jejím zavoláním pomocí `()`.
 
+### Práce se soubory — rychlá orientace
+
+```text
+open()       → otevře soubor
+read()       → načte obsah
+with open()  → bezpečně otevře a po skončení automaticky zavře
+"r"          → read / čtení
+"w"          → write / zápis
+```
+
+Příklad čtení:
+
+```python
+with open("employees.txt") as file:
+    content = file.read()
+```
+
+Příklad zápisu:
+
+```python
+with open("output.txt", "w") as file:
+    ...
+```
+
+Důležité:
+
+> `with` zavře soubor, ale data načtená do proměnné zůstávají v paměti.
+
+### CSV — rychlá orientace
+
+```python
+import csv
+```
+
+Čtení jako listy:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.reader(file)
+```
+
+Čtení jako dictionaries:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+```
+
+Zápis dictionaries:
+
+```python
+writer = csv.DictWriter(
+    file,
+    fieldnames=["name", "department", "salary"]
+)
+```
+
+### JSON — rychlá orientace
+
+```python
+import json
+```
+
+Načtení:
+
+```python
+with open("employees.json") as file:
+    employees = json.load(file)
+```
+
+Uložení:
+
+```python
+with open("output.json", "w") as file:
+    json.dump(employees, file, indent=4)
+```
+
+Pomůcka:
+
+```text
+json.load()  → soubor → Python
+json.dump()  → Python → soubor
+```
+
 ### Dvojtečka `:`
 
 Dvojtečka se používá tam, kde začíná nový odsazený blok kódu:
@@ -129,6 +213,9 @@ else:
     ...
 
 for salary in salaries:
+    ...
+
+with open("employees.txt") as file:
     ...
 ```
 
@@ -189,6 +276,10 @@ round(value, 2)
 - `return` vrací výsledek z funkce.
 - `print()` pouze zobrazuje hodnotu.
 - Funkce může volat jinou funkci.
+- `with open()` bezpečně pracuje se souborem a automaticky ho zavře.
+- Data načtená do proměnné zůstávají dostupná i po zavření souboru.
+- CSV je textový tabulkový formát.
+- JSON umí zachovat strukturu jako list, dictionary a číselné hodnoty.
 - Odsazení určuje strukturu programu.
 
 ---
@@ -2252,4 +2343,1566 @@ def      → vytvořím funkci
 parametr → funkce přijme hodnotu
 return   → funkce vrátí výsledek
 print()  → výsledek zobrazím
+```
+
+---
+
+# Lesson 05 — Working with Files
+
+## 59. Otevření souboru — `open()`
+
+Soubor lze otevřít pomocí:
+
+```python
+file = open("employees.txt")
+```
+
+Tím se soubor pouze otevře.
+
+Proměnná:
+
+```python
+file
+```
+
+není obsah souboru. Je to objekt reprezentující otevřený soubor.
+
+Obsah načteme například pomocí:
+
+```python
+content = file.read()
+```
+
+---
+
+## 60. Načtení obsahu — `read()`
+
+```python
+file = open("employees.txt")
+
+content = file.read()
+
+print(content)
+```
+
+Pokud `employees.txt` obsahuje:
+
+```text
+Petr
+Jana
+Martin
+Eva
+```
+
+`content` bude jeden `str`.
+
+Zjednodušeně:
+
+```text
+employees.txt
+↓
+open()
+↓
+file
+↓
+read()
+↓
+content
+```
+
+---
+
+## 61. Zavření souboru — `close()`
+
+Pokud soubor otevřeme pomocí:
+
+```python
+file = open("employees.txt")
+```
+
+měli bychom ho po práci zavřít:
+
+```python
+file.close()
+```
+
+Celý vzor:
+
+```python
+file = open("employees.txt")
+
+content = file.read()
+
+print(content)
+
+file.close()
+```
+
+---
+
+## 62. Bezpečnější práce se soubory — `with open()`
+
+Běžnější a bezpečnější způsob:
+
+```python
+with open("employees.txt") as file:
+    content = file.read()
+    print(content)
+```
+
+Po skončení odsazeného bloku Python soubor automaticky zavře.
+
+Princip:
+
+```text
+with open(...)
+↓
+soubor je otevřený
+↓
+odsazený blok s ním pracuje
+↓
+konec bloku
+↓
+soubor se automaticky zavře
+```
+
+---
+
+## 63. Data po zavření souboru nezmizí
+
+```python
+with open("employees.txt") as file:
+    content = file.read()
+
+print(content)
+```
+
+Toto funguje.
+
+Proč?
+
+Protože:
+
+```python
+content = file.read()
+```
+
+už data načetl do paměti.
+
+Po skončení `with`:
+
+```text
+employees.txt → zavřený
+content       → stále existuje
+```
+
+Důležité:
+
+> Zavření souboru neznamená smazání dat, která už byla načtena do proměnné.
+
+---
+
+## 64. Data v paměti vs. data na disku
+
+Soubor:
+
+```text
+employees.txt
+```
+
+je uložený na disku.
+
+Proměnná:
+
+```python
+content
+```
+
+existuje během běhu programu v paměti.
+
+Například:
+
+```python
+content.append("Karel")
+```
+
+změní pouze data v Pythonu.
+
+Původní soubor se tím automaticky nezmění.
+
+Princip:
+
+```text
+soubor na disku
+↓
+načtení
+↓
+data v paměti
+↓
+úpravy
+↓
+pokud je chceme zachovat
+↓
+explicitní zápis do souboru
+```
+
+---
+
+## 65. Aktuální pracovní složka — `os.getcwd()`
+
+Python při relativní cestě:
+
+```python
+open("employees.txt")
+```
+
+hledá soubor v aktuální pracovní složce.
+
+Zjistit ji můžeme:
+
+```python
+import os
+
+print(os.getcwd())
+```
+
+Například:
+
+```text
+C:\Users\...\python
+```
+
+Pak:
+
+```python
+open("employees.txt")
+```
+
+znamená prakticky:
+
+```text
+C:\Users\...\python\employees.txt
+```
+
+---
+
+## 66. Relativní cesta k souboru
+
+Soubor ve stejné pracovní složce:
+
+```python
+open("employees.txt")
+```
+
+Soubor v podsložce:
+
+```python
+open("data/employees.txt")
+```
+
+Příklad struktury:
+
+```text
+python/
+├── lesson_05.py
+└── data/
+    └── employees.txt
+```
+
+Pak použijeme:
+
+```python
+open("data/employees.txt")
+```
+
+---
+
+## 67. Proč je název souboru v uvozovkách
+
+```python
+open("employees.txt")
+```
+
+`"employees.txt"` je textová hodnota typu `str`.
+
+Stejně jako:
+
+```python
+name = "Petr"
+```
+
+můžeme použít proměnnou:
+
+```python
+file_name = "employees.txt"
+
+with open(file_name) as file:
+    ...
+```
+
+Rozdíl:
+
+```text
+"employees.txt" → konkrétní text
+file_name       → proměnná obsahující text
+```
+
+---
+
+## 68. `splitlines()` — řádky textu jako list
+
+Pokud:
+
+```python
+content = file.read()
+```
+
+vrací jeden `str`, můžeme řádky rozdělit:
+
+```python
+content = file.read().splitlines()
+```
+
+Například:
+
+```text
+Petr
+Jana
+Martin
+Eva
+```
+
+se změní na:
+
+```python
+["Petr", "Jana", "Martin", "Eva"]
+```
+
+Datové typy:
+
+```python
+type(content)     # list
+type(content[0])  # str
+```
+
+---
+
+## 69. Procházení načteného textu pomocí `for`
+
+Pokud:
+
+```python
+content = ["Petr", "Jana", "Martin", "Eva"]
+```
+
+můžeme:
+
+```python
+for name in content:
+    print(name)
+```
+
+Výstup:
+
+```text
+Petr
+Jana
+Martin
+Eva
+```
+
+Pozor:
+
+```python
+for name in content:
+    print(content)
+```
+
+vypíše celý list při každém průchodu.
+
+Správně:
+
+```python
+for name in content:
+    print(name)
+```
+
+---
+
+## 70. Filtrování načtených dat
+
+Například jména delší než 4 znaky:
+
+```python
+for name in content:
+    if len(name) > 4:
+        print(name)
+```
+
+Výstup:
+
+```text
+Martin
+```
+
+---
+
+## 71. Počítání filtrovaných záznamů
+
+```python
+count = 0
+
+for name in content:
+    if len(name) > 4:
+        count = count + 1
+
+print("Employees with long names:", count)
+```
+
+Důležité:
+
+```python
+count = 0
+```
+
+musíme vytvořit před použitím.
+
+Python sám neví, že proměnná `count` má být počítadlo.
+
+---
+
+## 72. CSV — základní struktura
+
+CSV = Comma-Separated Values.
+
+Příklad:
+
+```csv
+name,department,salary
+Petr,Sales,50000
+Jana,IT,65000
+Martin,Finance,48000
+Eva,Sales,72000
+```
+
+První řádek:
+
+```text
+name,department,salary
+```
+
+je hlavička.
+
+Další řádky jsou datové záznamy.
+
+---
+
+## 73. Mezery v CSV
+
+Běžný zápis:
+
+```csv
+Petr,Sales,50000
+```
+
+Pokud napíšeme:
+
+```csv
+Petr, Sales, 50000
+```
+
+mezery mohou být součástí hodnot:
+
+```text
+"Petr"
+" Sales"
+" 50000"
+```
+
+To může způsobit problém například při:
+
+```python
+if department == "Sales":
+```
+
+protože:
+
+```text
+"Sales" != " Sales"
+```
+
+---
+
+## 74. Načtení CSV jako obyčejného textu
+
+```python
+with open("employees.csv") as file:
+    content = file.read()
+
+print(content)
+```
+
+Výsledek je stále jeden `str`.
+
+Samotné `open()` nerozumí tomu, že CSV obsahuje sloupce.
+
+---
+
+## 75. Modul `csv`
+
+Pro práci s CSV:
+
+```python
+import csv
+```
+
+---
+
+## 76. `csv.reader()`
+
+```python
+with open("employees.csv") as file:
+    reader = csv.reader(file)
+
+    for row in reader:
+        print(row)
+```
+
+Výstup:
+
+```python
+['name', 'department', 'salary']
+['Petr', 'Sales', '50000']
+['Jana', 'IT', '65000']
+['Martin', 'Finance', '48000']
+['Eva', 'Sales', '72000']
+```
+
+Každý `row` je list.
+
+---
+
+## 77. Přístup ke sloupcům pomocí indexu
+
+Například:
+
+```python
+row = ['Petr', 'Sales', '50000']
+```
+
+Pak:
+
+```python
+row[0]  # Petr
+row[1]  # Sales
+row[2]  # 50000
+```
+
+Důležité:
+
+```python
+for row in reader:
+```
+
+postupuje po řádcích.
+
+```python
+row[1]
+```
+
+vybírá druhou hodnotu z aktuálního řádku.
+
+---
+
+## 78. CSV hodnoty se načítají jako `str`
+
+Například:
+
+```python
+row[2]
+```
+
+obsahuje:
+
+```python
+"50000"
+```
+
+tedy `str`.
+
+Pro výpočty:
+
+```python
+row[2] = int(row[2])
+```
+
+Pak:
+
+```python
+row[2]
+```
+
+je:
+
+```python
+50000
+```
+
+tedy `int`.
+
+---
+
+## 79. Hlavička a problém s převodem
+
+První řádek CSV:
+
+```python
+['name', 'department', 'salary']
+```
+
+Pokud zkusíme:
+
+```python
+int(row[2])
+```
+
+na prvním řádku, Python se pokusí udělat:
+
+```python
+int("salary")
+```
+
+což skončí chybou.
+
+---
+
+## 80. Přeskočení hlavičky pomocí `next()`
+
+```python
+with open("employees.csv") as file:
+    reader = csv.reader(file)
+
+    next(reader)
+
+    for row in reader:
+        row[2] = int(row[2])
+        print(row[2])
+```
+
+`next(reader)` vezme další řádek a posune reader dál.
+
+V tomto případě spotřebuje hlavičku.
+
+Důležité:
+
+> `next()` obecně neznamená „přeskoč hlavičku“. Znamená „vezmi další položku“.
+
+---
+
+## 81. Uložení hodnot z CSV do listu
+
+```python
+salaries = []
+
+with open("employees.csv") as file:
+    reader = csv.reader(file)
+
+    next(reader)
+
+    for row in reader:
+        row[2] = int(row[2])
+        salaries.append(row[2])
+```
+
+Výsledek:
+
+```python
+[50000, 65000, 48000, 72000]
+```
+
+---
+
+## 82. Použití funkce nad daty z CSV
+
+```python
+def average_salary(salaries):
+    average_salary = round(sum(salaries) / len(salaries), 2)
+    return average_salary
+
+result = average_salary(salaries)
+
+print("Average salary is:", result, "Kc")
+```
+
+Důležitý tok:
+
+```text
+CSV
+↓
+reader
+↓
+salary str → int
+↓
+list salaries
+↓
+funkce
+↓
+return
+↓
+result
+↓
+print
+```
+
+---
+
+## 83. `csv.DictReader()`
+
+Přehlednější způsob:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        print(row)
+```
+
+Výsledek:
+
+```python
+{
+    "name": "Petr",
+    "department": "Sales",
+    "salary": "50000"
+}
+```
+
+`DictReader` použije první řádek CSV jako názvy klíčů.
+
+Proto není potřeba:
+
+```python
+next(reader)
+```
+
+---
+
+## 84. Přístup přes názvy sloupců
+
+Místo:
+
+```python
+row[0]
+row[1]
+row[2]
+```
+
+můžeme:
+
+```python
+row["name"]
+row["department"]
+row["salary"]
+```
+
+To je přehlednější a čitelnější.
+
+---
+
+## 85. `DictReader` a datové typy
+
+I při použití `DictReader` jsou hodnoty z CSV text:
+
+```python
+row["salary"]  # str
+```
+
+Proto:
+
+```python
+row["salary"] = int(row["salary"])
+```
+
+Pak je v aktuálním dictionary:
+
+```python
+{
+    "name": "Petr",
+    "department": "Sales",
+    "salary": 50000
+}
+```
+
+---
+
+## 86. Reader a otevřený soubor
+
+Toto nefunguje:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+for row in reader:
+    print(row)
+```
+
+Po skončení `with` je soubor zavřený.
+
+`reader` ale data čte postupně ze souboru až během `for`.
+
+Proto musí být cyklus uvnitř:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        print(row)
+```
+
+---
+
+## 87. Rozdíl mezi `reader` a načtenými daty
+
+Toto funguje mimo `with`:
+
+```python
+with open("employees.json") as file:
+    employees = json.load(file)
+
+for employee in employees:
+    ...
+```
+
+Protože `employees` už obsahuje data v paměti.
+
+U `reader` je situace jiná:
+
+```text
+reader → čte soubor postupně
+employees → už načtená data
+```
+
+---
+
+## 88. Filtrování CSV přes `DictReader`
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        row["salary"] = int(row["salary"])
+
+        if row["salary"] > 60000:
+            print(row["name"], row["salary"])
+```
+
+Výstup:
+
+```text
+Jana 65000
+Eva 72000
+```
+
+---
+
+## 89. Uložení celých dictionaries do listu
+
+```python
+high_salary_employees = []
+
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+    for employee in reader:
+        employee["salary"] = int(employee["salary"])
+
+        if employee["salary"] > 60000:
+            high_salary_employees.append(employee)
+```
+
+Výsledek:
+
+```python
+[
+    {"name": "Jana", "department": "IT", "salary": 65000},
+    {"name": "Eva", "department": "Sales", "salary": 72000}
+]
+```
+
+Rozdíl:
+
+```python
+high_salary_employees.append(employee["salary"])
+```
+
+uloží jen mzdy.
+
+```python
+high_salary_employees.append(employee)
+```
+
+uloží celý dictionary.
+
+---
+
+## 90. Vytvoření nového CSV souboru
+
+```python
+with open("high_salary_employees.csv", "w", newline="") as file:
+    pass
+```
+
+`"w"` znamená write.
+
+Pokud soubor neexistuje, Python ho vytvoří.
+
+Pozor:
+
+> `"w"` přepíše existující obsah souboru.
+
+---
+
+## 91. `csv.DictWriter()`
+
+```python
+with open("high_salary_employees.csv", "w", newline="") as file:
+    writer = csv.DictWriter(
+        file,
+        fieldnames=["name", "department", "salary"]
+    )
+```
+
+`fieldnames` určuje názvy sloupců.
+
+---
+
+## 92. Zápis hlavičky — `writeheader()`
+
+```python
+writer.writeheader()
+```
+
+Zapíše:
+
+```csv
+name,department,salary
+```
+
+---
+
+## 93. Zápis více dictionaries — `writerows()`
+
+```python
+writer.writerows(high_salary_employees)
+```
+
+Celý zápis:
+
+```python
+with open("high_salary_employees.csv", "w", newline="") as file:
+    writer = csv.DictWriter(
+        file,
+        fieldnames=["name", "department", "salary"]
+    )
+
+    writer.writeheader()
+    writer.writerows(high_salary_employees)
+```
+
+Výsledný CSV:
+
+```csv
+name,department,salary
+Jana,IT,65000
+Eva,Sales,72000
+```
+
+---
+
+## 94. `print()` vs. zápis do souboru
+
+```python
+print(data)
+```
+
+zobrazí data v terminálu.
+
+```python
+writer.writerows(data)
+```
+
+zapíše data do CSV.
+
+Důležité:
+
+```text
+print()              → terminál
+writer.writeheader() → hlavička do CSV
+writer.writerows()   → data do CSV
+```
+
+---
+
+## 95. CSV neuchovává Python datové typy
+
+V CSV:
+
+```csv
+Jana,IT,65000
+```
+
+je vše uloženo jako textový formát.
+
+Po novém načtení přes `csv.DictReader`:
+
+```python
+row["salary"]
+```
+
+bude znovu:
+
+```python
+"65000"
+```
+
+tedy `str`.
+
+Pokud chceme počítat:
+
+```python
+row["salary"] = int(row["salary"])
+```
+
+---
+
+## 96. JSON — základní struktura
+
+Příklad:
+
+```json
+[
+    {
+        "name": "Petr",
+        "department": "Sales",
+        "salary": 50000
+    },
+    {
+        "name": "Jana",
+        "department": "IT",
+        "salary": 65000
+    }
+]
+```
+
+Celá struktura připomíná:
+
+```text
+list
+↓
+dictionary
+↓
+hodnoty
+```
+
+---
+
+## 97. Modul `json`
+
+```python
+import json
+```
+
+---
+
+## 98. Načtení JSON — `json.load()`
+
+```python
+with open("employees.json") as file:
+    employees = json.load(file)
+```
+
+`employees` může být například:
+
+```python
+[
+    {"name": "Petr", "department": "Sales", "salary": 50000},
+    {"name": "Jana", "department": "IT", "salary": 65000}
+]
+```
+
+---
+
+## 99. JSON zachovává číselné hodnoty
+
+V JSON:
+
+```json
+"salary": 50000
+```
+
+bez uvozovek znamená číslo.
+
+Po načtení:
+
+```python
+employees[0]["salary"]
+```
+
+bude:
+
+```python
+50000
+```
+
+a typ:
+
+```python
+int
+```
+
+Na rozdíl od CSV tedy často nemusíme dělat:
+
+```python
+int(employee["salary"])
+```
+
+---
+
+## 100. Přístup k datům z JSON
+
+Pokud:
+
+```python
+employees
+```
+
+je list dictionaries:
+
+```python
+employees[0]
+```
+
+je první dictionary.
+
+```python
+employees[0]["salary"]
+```
+
+je plat prvního zaměstnance.
+
+Důležité:
+
+```python
+employees["salary"]
+```
+
+nefunguje, protože `employees` je list.
+
+List používá indexy:
+
+```python
+employees[0]
+```
+
+Dictionary používá klíče:
+
+```python
+employee["salary"]
+```
+
+---
+
+## 101. Procházení JSON dat
+
+```python
+for employee in employees:
+    print(employee["name"], employee["salary"])
+```
+
+Výstup:
+
+```text
+Petr 50000
+Jana 65000
+Martin 48000
+Eva 72000
+```
+
+---
+
+## 102. Filtrování JSON dat
+
+```python
+high_salary_employees = []
+
+for employee in employees:
+    if employee["salary"] > 60000:
+        high_salary_employees.append(employee)
+```
+
+Výsledek:
+
+```python
+[
+    {"name": "Jana", "department": "IT", "salary": 65000},
+    {"name": "Eva", "department": "Sales", "salary": 72000}
+]
+```
+
+---
+
+## 103. Zápis JSON — `json.dump()`
+
+```python
+with open("high_salary_employees.json", "w") as file:
+    json.dump(high_salary_employees, file)
+```
+
+Pomůcka:
+
+```text
+load  → načti
+dump  → ulož
+```
+
+---
+
+## 104. Formátovaný JSON — `indent=4`
+
+Bez:
+
+```python
+json.dump(data, file)
+```
+
+se JSON může uložit na jeden řádek.
+
+Přehlednější zápis:
+
+```python
+json.dump(data, file, indent=4)
+```
+
+Výsledek:
+
+```json
+[
+    {
+        "name": "Jana",
+        "department": "IT",
+        "salary": 65000
+    },
+    {
+        "name": "Eva",
+        "department": "Sales",
+        "salary": 72000
+    }
+]
+```
+
+---
+
+## 105. CSV vs. JSON
+
+### CSV
+
+```text
+name,department,salary
+Petr,Sales,50000
+```
+
+Výhody:
+
+- jednoduchý tabulkový formát,
+- běžný v analytice,
+- dobře se otevírá v Excelu,
+- vhodný pro řádky a sloupce.
+
+Nevýhody:
+
+- hodnoty se při práci přes modul `csv` běžně načítají jako text,
+- neumí přirozeně složitější vnořenou strukturu.
+
+### JSON
+
+```json
+{
+    "name": "Petr",
+    "department": "Sales",
+    "salary": 50000
+}
+```
+
+Výhody:
+
+- přirozeně odpovídá listům a dictionaries,
+- zachovává číselné hodnoty,
+- umí složitější strukturu,
+- často se používá v API.
+
+---
+
+## 106. Praktický tok práce se soubory
+
+Obecný vzor:
+
+```text
+soubor na disku
+↓
+open()
+↓
+načtení
+↓
+data v Pythonu
+↓
+čištění / filtrování / výpočty
+↓
+výsledná data
+↓
+uložení do nového souboru
+```
+
+Příklad:
+
+```text
+employees.csv
+↓
+DictReader
+↓
+salary str → int
+↓
+if salary > 60000
+↓
+high_salary_employees
+↓
+DictWriter
+↓
+high_salary_employees.csv
+```
+
+Nebo:
+
+```text
+employees.json
+↓
+json.load()
+↓
+list dictionaries
+↓
+if salary > 60000
+↓
+high_salary_employees
+↓
+json.dump()
+↓
+high_salary_employees.json
+```
+
+---
+
+## 107. Nejčastější chyby při práci se soubory
+
+### Práce s readerem po zavření souboru
+
+Špatně:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+for row in reader:
+    print(row)
+```
+
+Chyba:
+
+```text
+ValueError: I/O operation on closed file
+```
+
+Správně:
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        print(row)
+```
+
+---
+
+### Pokus o použití klíče na listu
+
+Špatně:
+
+```python
+high_salary_employees["name"]
+```
+
+pokud `high_salary_employees` je list.
+
+Správně například:
+
+```python
+high_salary_employees[0]["name"]
+```
+
+nebo:
+
+```python
+for employee in high_salary_employees:
+    print(employee["name"])
+```
+
+---
+
+### Zapomenutý převod CSV hodnoty na číslo
+
+```python
+row["salary"]
+```
+
+je po `DictReader` obvykle `str`.
+
+Pro výpočty:
+
+```python
+row["salary"] = int(row["salary"])
+```
+
+---
+
+### Zapomenutý `next(reader)` u `csv.reader()`
+
+Pokud chceme přeskočit hlavičku:
+
+```python
+reader = csv.reader(file)
+next(reader)
+```
+
+---
+
+### Zbytečný `next(reader)` u `DictReader`
+
+```python
+reader = csv.DictReader(file)
+```
+
+už hlavičku použije jako názvy klíčů.
+
+Pokud pak ještě uděláme:
+
+```python
+next(reader)
+```
+
+zahodíme první datový řádek.
+
+---
+
+### `print()` místo zápisu
+
+```python
+print(data)
+```
+
+nezapisuje do souboru.
+
+Pro CSV:
+
+```python
+writer.writerows(data)
+```
+
+Pro JSON:
+
+```python
+json.dump(data, file)
+```
+
+---
+
+## 108. Shrnutí práce se soubory
+
+### TXT
+
+```python
+with open("employees.txt") as file:
+    content = file.read()
+```
+
+### TXT jako list řádků
+
+```python
+with open("employees.txt") as file:
+    content = file.read().splitlines()
+```
+
+### CSV jako listy
+
+```python
+with open("employees.csv") as file:
+    reader = csv.reader(file)
+```
+
+### CSV jako dictionaries
+
+```python
+with open("employees.csv") as file:
+    reader = csv.DictReader(file)
+```
+
+### Převod mzdy z CSV
+
+```python
+employee["salary"] = int(employee["salary"])
+```
+
+### Zápis CSV
+
+```python
+with open("output.csv", "w", newline="") as file:
+    writer = csv.DictWriter(
+        file,
+        fieldnames=["name", "department", "salary"]
+    )
+
+    writer.writeheader()
+    writer.writerows(data)
+```
+
+### Načtení JSON
+
+```python
+with open("employees.json") as file:
+    employees = json.load(file)
+```
+
+### Zápis JSON
+
+```python
+with open("output.json", "w") as file:
+    json.dump(employees, file, indent=4)
+```
+
+Nejdůležitější princip:
+
+```text
+soubor
+↓
+načíst
+↓
+pracovat s daty v Pythonu
+↓
+výsledek
+↓
+pokud ho chci zachovat
+↓
+zapsat do nového souboru
 ```
