@@ -39,8 +39,6 @@ def find_largest_order(orders):
 
 largest_order = find_largest_order(orders)
 
-largest_order = find_largest_order(orders)
-
 def find_lowest_order(orders):
     lowest_order = orders[0]
 
