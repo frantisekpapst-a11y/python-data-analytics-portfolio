@@ -1,6 +1,6 @@
-# Python Cheatsheet
+# Python Basics Cheatsheet
 
-Praktický tahák z mého studia Pythonu pro datovou analytiku.
+Praktický tahák z mého studia základů Pythonu.
 
 ---
 
