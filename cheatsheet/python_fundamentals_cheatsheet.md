@@ -1,4 +1,4 @@
-# Python Basics Cheatsheet
+# Python Fundamentals Cheatsheet
 
 Praktický tahák z mého studia základů Pythonu.
 
