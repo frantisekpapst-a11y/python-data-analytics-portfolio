@@ -1,585 +1,529 @@
-## Test 1 — Převod datového typu
+## Test 1 — Načtení a kontrola dat
 
 ### Zadání
 
-Máš proměnnou:
+Načti soubor:
 
-```python
-salary = "55000"
+```text
+ecommerce_sales_analysis.csv
 ```
 
-Chceš zvýšit mzdu o `5000`.
+Proveď následující:
 
-Tento zápis nebude fungovat:
-
-```python
-new_salary = salary + 5000
-```
-
-### Otázky
-
-1. Proč tento zápis nefunguje?
-2. Jak upravíš kód tak, aby výsledkem bylo číslo `60000`?
+1. importuj knihovnu `pandas`
+2. načti CSV soubor do proměnné `df`
+3. zobraz prvních 5 řádků
+4. zobraz počet řádků a sloupců
+5. zobraz názvy všech sloupců
+6. zobraz základní informace o datasetu
 
 ### Řešení
 
-Hodnota `"55000"` je textový datový typ `str`, zatímco `5000` je číslo typu `int`.
-
-Nejprve je nutné text převést na číslo:
-
 ```python
-salary = int(salary)
-new_salary = salary + 5000
+import pandas as pd
 
-print(new_salary)
+df = pd.read_csv("ecommerce_sales_analysis.csv")
+
+print(df.head())
+
+print(df.shape)
+
+print(df.columns)
+
+df.info()
 ```
 
-Výsledek:
+### Vysvětlení
+
+```python
+df.head()
+```
+
+zobrazí prvních 5 řádků datasetu.
+
+```python
+df.shape
+```
+
+vrací dvojici:
 
 ```text
-60000
+(počet řádků, počet sloupců)
 ```
-
-Pokud bychom chtěli pracovat s desetinnými čísly, můžeme použít:
 
 ```python
-salary = float(salary)
+df.columns
 ```
+
+vrací názvy sloupců.
+
+```python
+df.info()
+```
+
+zobrazí informace o struktuře datasetu, počtu neprázdných hodnot a datových typech.
+
+`shape` a `columns` jsou atributy, proto se za nimi nepoužívají závorky.
+
+`info()` je metoda, proto se používají závorky.
+
+Není potřeba psát:
+
+```python
+print(df.info())
+```
+
+protože `df.info()` svůj výstup zobrazí sama.
 
 ---
 
-## Test 2 — Filtrování hodnot do nového listu
+## Test 2 — Nový sloupec a agregace
 
 ### Zadání
 
-Máš seznam mezd:
+Vytvoř nový sloupec:
 
-```python
-salaries = [42000, 55000, 61000, 48000, 72500]
+```text
+total
 ```
 
-Vytvoř nový list `high_salaries`, který bude obsahovat pouze mzdy vyšší než `50000`.
+jako:
+
+```text
+quantity × unit_price
+```
+
+Potom vypočítej:
+
+1. celkové tržby
+2. průměrnou hodnotu objednávky
+3. nejvyšší hodnotu objednávky
+4. nejnižší hodnotu objednávky
+
+Výsledky ulož do proměnných a vypiš.
 
 ### Řešení
 
 ```python
-high_salaries = []
+df["total"] = df["quantity"] * df["unit_price"]
 
-for salary in salaries:
-    if salary > 50000:
-        high_salaries.append(salary)
+total_revenue = df["total"].sum()
 
-print(high_salaries)
+avg_order = df["total"].mean()
+
+max_order_value = df["total"].max()
+
+min_order_value = df["total"].min()
+
+print("Celkové tržby:", total_revenue, "Kč")
+
+print("Průměrná objednávka:", avg_order, "Kč")
+
+print("Nejnižší objednávka:", min_order_value, "Kč")
+
+print("Nejvyšší objednávka:", max_order_value, "Kč")
 ```
 
-Výsledek:
+### Vysvětlení
+
+Tento zápis:
+
+```python
+df["total"] = df["quantity"] * df["unit_price"]
+```
+
+provede výpočet po jednotlivých řádcích bez použití `for` cyklu.
+
+Použité agregace:
+
+```python
+.sum()
+.mean()
+.max()
+.min()
+```
+
+znamenají:
 
 ```text
-[55000, 61000, 72500]
+sum()   → součet
+mean()  → průměr
+max()   → maximum
+min()   → minimum
 ```
 
-Princip:
-
-```text
-původní list
-    ↓
-for
-    ↓
-if
-    ↓
-append()
-    ↓
-nový list
-```
+Název `max_order_value` je přesnější než například `max_revenue`, protože hledáme nejvyšší hodnotu jedné objednávky, nikoli celkové tržby.
 
 ---
 
-## Test 3 — Indexy a slicing
+## Test 3 — Filtrování dat
 
 ### Zadání
 
-Máš list:
-
-```python
-salaries = [42000, 55000, 61000, 48000, 72500]
-```
-
-Urči výsledek:
-
-```python
-print(salaries[1:4])
-print(salaries[-2])
-```
+1. vypočítej průměrnou hodnotu objednávky
+2. vyfiltruj objednávky, jejichž `total` je vyšší než průměr
+3. výsledek ulož do `above_average_orders`
+4. vyfiltruj objednávky z kategorie `"Furniture"`
+5. výsledek ulož do `furniture_orders`
+6. vypočítej celkové tržby pouze pro kategorii `Furniture`
 
 ### Řešení
 
-První výraz:
-
 ```python
-salaries[1:4]
-```
+average_order = df["total"].mean()
 
-vybere hodnoty od indexu `1` včetně do indexu `4` bez něj.
-
-Výsledek:
-
-```text
-[55000, 61000, 48000]
-```
-
-Druhý výraz:
-
-```python
-salaries[-2]
-```
-
-vrátí druhou hodnotu od konce.
-
-Výsledek:
-
-```text
-48000
-```
-
----
-
-## Test 4 — `sorted()` a změna původního listu
-
-### Zadání
-
-Urči výsledný obsah proměnných `salaries` a `sorted_salaries`:
-
-```python
-salaries = [55000, 42000, 72000]
-
-sorted_salaries = sorted(salaries)
-
-salaries.append(60000)
-```
-
-### Řešení
-
-Po:
-
-```python
-sorted_salaries = sorted(salaries)
-```
-
-vznikne nový seřazený list:
-
-```python
-sorted_salaries = [42000, 55000, 72000]
-```
-
-Původní list zůstává:
-
-```python
-salaries = [55000, 42000, 72000]
-```
-
-Následně:
-
-```python
-salaries.append(60000)
-```
-
-změní pouze původní `salaries`.
-
-Finální stav:
-
-```python
-salaries = [55000, 42000, 72000, 60000]
-sorted_salaries = [42000, 55000, 72000]
-```
-
-Důležité:
-
-* `sorted()` vytvoří nový list.
-* `append()` změní list, na kterém je metoda zavolána.
-* `append()` nepřidává hodnotu automaticky na správnou pozici podle velikosti, ale vždy na konec.
-
----
-
-## Test 5 — `enumerate()`, index a hodnota
-
-### Zadání
-
-Urči přesný výstup:
-
-```python
-sales = [100, 200, 300, 400]
-
-for index, sale in enumerate(sales):
-    if sale >= 300:
-        print(index, sale)
-```
-
-### Řešení
-
-`enumerate()` poskytuje při každém průchodu index a hodnotu.
-
-List:
-
-```text
-index 0 → 100
-index 1 → 200
-index 2 → 300
-index 3 → 400
-```
-
-Podmínku:
-
-```python
-sale >= 300
-```
-
-splní pouze hodnoty `300` a `400`.
-
-Výstup:
-
-```text
-2 300
-3 400
-```
-
-Pokud bychom změnili pořadí ve `print()`:
-
-```python
-print(sale, index)
-```
-
-výsledek by byl:
-
-```text
-300 2
-400 3
-```
-
-Pořadí v:
-
-```python
-for index, sale in enumerate(sales):
-```
-
-určuje, co se uloží do jednotlivých proměnných.
-
-Pořadí v:
-
-```python
-print(sale, index)
-```
-
-určuje pouze pořadí výpisu.
-
----
-
-## Test 6 — vytvoření dictionary a přístup k hodnotám
-
-### Zadání
-
-Vytvoř dictionary `product` s následujícími údaji:
-
-```text
-name → Laptop
-category → Electronics
-price → 25000
-in_stock → True
-```
-
-Potom vypiš pouze název produktu a jeho cenu.
-
-### Řešení
-
-Dictionary vytvoříme pomocí `{}`:
-
-```python
-product = {
-    "name": "Laptop",
-    "category": "Electronics",
-    "price": 25000,
-    "in_stock": True
-}
-```
-
-Ke konkrétní hodnotě přistupujeme pomocí názvu dictionary a klíče v `[]`:
-
-```python
-print(product["name"], product["price"])
-```
-
-Výstup:
-
-```text
-Laptop 25000
-```
-
-`product` je celý dictionary.
-
-`"name"` a `"price"` jsou jeho klíče:
-
-```python
-product["name"]
-product["price"]
-```
-
----
-
-## Test 7 — změna a přidání hodnoty v dictionary
-
-### Zadání
-
-Použij dictionary `product` z předchozího testu.
-
-Změň cenu produktu z `25000` na `23000`.
-
-Potom přidej nový klíč:
-
-```text
-discount → True
-```
-
-Nakonec vypiš celý dictionary.
-
-### Řešení
-
-Existující hodnotu změníme pomocí jejího klíče:
-
-```python
-product["price"] = 23000
-```
-
-Nový klíč přidáme stejným způsobem:
-
-```python
-product["discount"] = True
-```
-
-Potom:
-
-```python
-print(product)
-```
-
-Výsledek:
-
-```text
-{'name': 'Laptop', 'category': 'Electronics', 'price': 23000, 'in_stock': True, 'discount': True}
-```
-
-Pokud klíč již existuje:
-
-```python
-product["price"] = 23000
-```
-
-jeho hodnota se změní.
-
-Pokud klíč neexistuje:
-
-```python
-product["discount"] = True
-```
-
-Python vytvoří nový klíč a přiřadí mu hodnotu.
-
----
-
-## Test 8 — odstranění položky z dictionary
-
-### Zadání
-
-Z dictionary `product` odstraň klíč:
-
-```text
-discount
-```
-
-Potom vypiš celý dictionary.
-
-### Řešení
-
-Pro odstranění klíče můžeme použít:
-
-```python
-product.pop("discount")
-```
-
-Potom:
-
-```python
-print(product)
-```
-
-Výsledek:
-
-```text
-{'name': 'Laptop', 'category': 'Electronics', 'price': 23000, 'in_stock': True}
-```
-
-Metoda:
-
-```python
-.pop()
-```
-
-odstraní z dictionary zadaný klíč společně s jeho hodnotou.
-
----
-
-## Test 9 — list dictionaries, `for` a filtrování pomocí `if`
-
-### Zadání
-
-Vytvoř list `products`, který obsahuje tři produkty:
-
-```text
-Laptop → Electronics → 23000
-Mouse → Electronics → 800
-Desk → Furniture → 12000
-```
-
-Každý produkt bude samostatný dictionary.
-
-Pomocí `for` a `if` vypiš pouze název a cenu produktů, jejichž cena je vyšší než `10000`.
-
-### Řešení
-
-List obsahující dictionaries:
-
-```python
-products = [
-    {"name": "Laptop", "category": "Electronics", "price": 23000},
-    {"name": "Mouse", "category": "Electronics", "price": 800},
-    {"name": "Desk", "category": "Furniture", "price": 12000}
+above_average_orders = df[
+    df["total"] > average_order
 ]
+
+furniture_orders = df[
+    df["category"] == "Furniture"
+]
+
+total_revenue_furniture = furniture_orders["total"].sum()
+
+print(
+    "Celkové tržby nábytek:",
+    total_revenue_furniture,
+    "Kč"
+)
 ```
 
-Potom projdeme jednotlivé produkty:
+### Vysvětlení
+
+Samotná podmínka:
 
 ```python
-for product in products:
-    if product["price"] > 10000:
-        print(product["name"], product["price"])
+df["total"] > average_order
 ```
 
-Výstup:
+vrací hodnoty:
 
 ```text
-Laptop 23000
-Desk 12000
+True
+False
+True
+...
 ```
 
-`for` postupně uloží každý dictionary do proměnné `product`.
+Jedná se o takzvanou **boolean masku**.
 
-Podmínka:
+Boolean maska určuje, které řádky budou zachovány.
+
+Použití:
 
 ```python
-if product["price"] > 10000:
+df[df["total"] > average_order]
 ```
 
-zkontroluje hodnotu pod klíčem `"price"`.
+znamená:
 
-Pokud je podmínka `True`, vypíšeme hodnoty pod klíči:
+```text
+vezmi DataFrame df
+→ otestuj podmínku
+→ ponech pouze řádky s hodnotou True
+```
+
+Stejný princip platí pro textový filtr:
 
 ```python
-product["name"]
-product["price"]
+df[df["category"] == "Furniture"]
+```
+
+Potom můžeme nad filtrovaným DataFrame provádět další agregace:
+
+```python
+furniture_orders["total"].sum()
 ```
 
 ---
 
-## Test 10 — filtrování dictionaries do nového listu
+## Test 4 — Řazení a nejvyšší objednávka
 
 ### Zadání
 
-Z existujícího listu `products` vytvoř nový prázdný list:
+1. seřaď celý dataset podle `total` sestupně
+2. výsledek ulož do `sorted_orders`
+3. zobraz prvních 5 řádků
+4. zjisti, která objednávka má nejvyšší hodnotu `total`
 
-```python
-expensive_products = []
-```
-
-Do něj ulož celý dictionary každého produktu, jehož cena je vyšší než `10000`.
-
-Potom nový list projdi pomocí dalšího `for` a vypiš pouze název produktu a jeho kategorii.
+Nepoužívej žádnou novou Pandas funkci.
 
 ### Řešení
 
-Nejprve vytvoříme prázdný list:
-
 ```python
-expensive_products = []
+sorted_orders = df.sort_values(
+    by="total",
+    ascending=False
+)
+
+print(sorted_orders.head())
+
+print(sorted_orders.head(1))
 ```
 
-Potom projdeme původní data:
+### Vysvětlení
 
 ```python
-for product in products:
-    if product["price"] > 10000:
-        expensive_products.append(product)
+ascending=False
 ```
 
-Pokud produkt splní podmínku:
-
-```python
-product["price"] > 10000
-```
-
-uložíme celý jeho dictionary do nového listu:
-
-```python
-expensive_products.append(product)
-```
-
-Výsledný list potom znovu projdeme:
-
-```python
-for product in expensive_products:
-    print(product["name"], product["category"])
-```
-
-Výstup:
+znamená sestupné řazení:
 
 ```text
-Laptop Electronics
-Desk Furniture
+nejvyšší
+→ nejnižší
 ```
 
-První `for` tedy provádí výběr:
-
-```text
-products
-↓
-kontrola price
-↓
-expensive_products
-```
-
-Druhý `for` pracuje už pouze s vybranými produkty:
-
-```text
-expensive_products
-↓
-name + category
-↓
-výpis
-```
-
-Důležitý rozdíl je mezi:
+Po seřazení je proto nejvyšší objednávka na prvním místě.
 
 ```python
-expensive_products.append(product)
+sorted_orders.head(1)
 ```
 
-a:
+zobrazí první řádek výsledku.
+
+Důležitý rozdíl:
 
 ```python
-expensive_products.append(product["name"])
+sorted_orders["total"].max()
 ```
 
-První varianta uloží **celý dictionary produktu**.
+vrátí pouze nejvyšší hodnotu `total`.
 
-Druhá varianta by uložila pouze **hodnotu klíče `"name"`**.
+Například:
+
+```text
+75000
+```
+
+Ale:
+
+```python
+sorted_orders.head(1)
+```
+
+vrátí celý řádek objednávky, takže vidíme i produkt, kategorii, množství a další údaje.
+
+### Index vs. pořadí řádku
+
+Po použití:
+
+```python
+df.sort_values(...)
+```
+
+Pandas řádky přesune, ale jejich původní indexy zachová.
+
+Výsledek může například vypadat:
+
+```text
+   product       total
+7  Laptop        50000
+1  Chair         30000
+4  Desk          25000
+```
+
+První řádek zde má index `7`.
+
+```python
+head(1)
+```
+
+znamená:
+
+```text
+zobraz první jeden řádek podle aktuálního pořadí
+```
+
+Neznamená:
+
+```text
+zobraz řádek s indexem 1
+```
+
+Pokud bychom chtěli index po seřazení vytvořit znovu:
+
+```python
+sorted_orders = sorted_orders.reset_index(drop=True)
+```
 
 ---
 
+## Test 5 — Kompletní analytický workflow
 
+### Zadání
+
+Vytvoř jeden souvislý skript, který:
+
+1. načte `ecommerce_sales_analysis.csv`
+2. vytvoří sloupec `total`
+3. vypočítá průměrnou hodnotu objednávky
+4. vyfiltruje objednávky nad průměrem
+5. vyfiltrované objednávky seřadí podle `total` sestupně
+6. uloží výsledek do CSV:
+
+```text
+above_average_orders_test.csv
+```
+
+bez pandas indexu
+
+7. uloží stejný výsledek do JSON:
+
+```text
+above_average_orders_test.json
+```
+
+s nastavením:
+
+```python
+orient="records"
+indent=4
+```
+
+### Řešení
+
+```python
+import pandas as pd
+
+df = pd.read_csv("ecommerce_sales_analysis.csv")
+
+df["total"] = df["quantity"] * df["unit_price"]
+
+average_order = df["total"].mean()
+
+above_average_orders = df[
+    df["total"] > average_order
+]
+
+sorted_orders = above_average_orders.sort_values(
+    by="total",
+    ascending=False
+)
+
+sorted_orders.to_csv(
+    "above_average_orders_test.csv",
+    index=False
+)
+
+sorted_orders.to_json(
+    "above_average_orders_test.json",
+    orient="records",
+    indent=4
+)
+```
+
+### Vysvětlení
+
+Správné pořadí operací je:
+
+```text
+načtení
+→ výpočet
+→ agregace
+→ filtrování
+→ řazení
+→ export
+```
+
+Důležitý je tento krok:
+
+```python
+sorted_orders = above_average_orders.sort_values(
+    by="total",
+    ascending=False
+)
+```
+
+Řadíme pouze objednávky, které už prošly filtrem.
+
+Pokud bychom napsali:
+
+```python
+sorted_orders = df.sort_values(
+    by="total",
+    ascending=False
+)
+```
+
+seřadili bychom celý původní dataset.
+
+Při exportu proto také používáme:
+
+```python
+sorted_orders.to_csv(...)
+sorted_orders.to_json(...)
+```
+
+aby se do souborů uložil skutečný finální výsledek analýzy.
+
+---
+
+## Shrnutí lekce 6
+
+V minitestech byly procvičeny následující dovednosti:
+
+```python
+pd.read_csv()
+
+df.head()
+df.shape
+df.columns
+df.info()
+
+df["new_column"] = ...
+
+.sum()
+.mean()
+.min()
+.max()
+
+df[podmínka]
+
+.sort_values()
+
+.to_csv()
+.to_json()
+```
+
+### Hlavní analytický princip
+
+```text
+DataFrame
+→ kontrola
+→ transformace
+→ výpočet
+→ filtr
+→ řazení
+→ export
+```
+
+### Výsledek minitestů
+
+```text
+Test 1: 5 / 5
+Test 2: 5 / 5
+Test 3: 5 / 5
+Test 4: 4,5 / 5
+Test 5: 4 / 5
+
+Celkem: 23,5 / 25
+```
+
+### Co dále procvičovat
+
+* přesně rozlišovat mezi hodnotou a celým řádkem
+* sledovat, nad kterým DataFrame právě provádíme operaci
+* používat výstižné názvy proměnných
+* věnovat pozornost pořadí jednotlivých kroků analýzy
+
+Další téma:
+
+```text
+Lekce 7
+→ filtrování s více podmínkami
+→ &, |, ~
+→ isin()
+→ loc a iloc
+```
