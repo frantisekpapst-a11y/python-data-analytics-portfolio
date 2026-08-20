@@ -1,3 +1,5 @@
+# Lekce 6
+
 ## Test 1 — Načtení a kontrola dat
 
 ### Zadání
@@ -460,70 +462,703 @@ aby se do souborů uložil skutečný finální výsledek analýzy.
 
 ---
 
-## Shrnutí lekce 6
+# Lekce 7
 
-V minitestech byly procvičeny následující dovednosti:
+## Test 1 — Filtrování pomocí AND
+
+### Zadání
+
+Vyber objednávky, které současně splňují obě podmínky:
+
+* `category == "Furniture"`
+* `total > 15000`
+
+Výsledek ulož do:
 
 ```python
-pd.read_csv()
-
-df.head()
-df.shape
-df.columns
-df.info()
-
-df["new_column"] = ...
-
-.sum()
-.mean()
-.min()
-.max()
-
-df[podmínka]
-
-.sort_values()
-
-.to_csv()
-.to_json()
+furniture_high_value
 ```
 
-### Hlavní analytický princip
+Použij operátor `&`.
 
-```text
-DataFrame
-→ kontrola
-→ transformace
-→ výpočet
-→ filtr
-→ řazení
-→ export
+### Řešení
+
+```python
+furniture_high_value = df[
+    (df["category"] == "Furniture")
+    & (df["total"] > 15000)
+]
 ```
 
-### Výsledek minitestů
+### Vysvětlení
+
+V Pandas se při kombinování boolean podmínek nad `Series` používá:
 
 ```text
-Test 1: 5 / 5
-Test 2: 5 / 5
-Test 3: 5 / 5
-Test 4: 4,5 / 5
-Test 5: 4 / 5
-
-Celkem: 23,5 / 25
+& → AND
+| → OR
+~ → NOT
+^ → XOR
 ```
 
-### Co dále procvičovat
-
-* přesně rozlišovat mezi hodnotou a celým řádkem
-* sledovat, nad kterým DataFrame právě provádíme operaci
-* používat výstižné názvy proměnných
-* věnovat pozornost pořadí jednotlivých kroků analýzy
-
-Další téma:
+Na rozdíl od běžného Pythonu zde nepoužíváme:
 
 ```text
-Lekce 7
-→ filtrování s více podmínkami
-→ &, |, ~
+and
+or
+not
+```
+
+Každá podmínka musí být při použití `&` nebo `|` uzavřena do vlastních závorek:
+
+```python
+(df["category"] == "Furniture")
+&
+(df["total"] > 15000)
+```
+
+Samotné podmínky vytvářejí boolean masky:
+
+```text
+True
+False
+True
+...
+```
+
+Vnější:
+
+```python
+df[...]
+```
+
+potom tuto masku aplikuje na celý DataFrame.
+
+SQL obdoba:
+
+```sql
+WHERE category = 'Furniture'
+  AND total > 15000
+```
+
+---
+
+## Test 2 — OR a NOT
+
+### Zadání
+
+Vytvoř dva filtry.
+
+První filtr vybere objednávky, které splňují alespoň jednu z podmínek:
+
+* `quantity >= 4`
+* `total > 20000`
+
+Výsledek ulož do:
+
+```python
+high_quantity_or_value
+```
+
+Druhý filtr vybere všechny objednávky, které nejsou z kategorie:
+
+```text
+Electronics
+```
+
+Výsledek ulož do:
+
+```python
+not_electronics
+```
+
+U druhého filtru použij operátor `~`.
+
+### Řešení
+
+```python
+high_quantity_or_value = df[
+    (df["quantity"] >= 4)
+    | (df["total"] > 20000)
+]
+
+not_electronics = df[
+    ~(df["category"] == "Electronics")
+]
+```
+
+### Vysvětlení
+
+Operátor:
+
+```python
+|
+```
+
+znamená OR.
+
+Řádek tedy projde filtrem, pokud platí alespoň jedna podmínka.
+
+```text
+quantity >= 4
+NEBO
+total > 20000
+```
+
+Operátor:
+
+```python
+~
+```
+
+neznamená porovnání.
+
+Neguje již vytvořenou boolean podmínku.
+
+Nejprve:
+
+```python
+df["category"] == "Electronics"
+```
+
+vytvoří například:
+
+```text
+True
+False
+True
+...
+```
+
+Potom:
+
+```python
+~(df["category"] == "Electronics")
+```
+
+hodnoty obrátí:
+
+```text
+False
+True
+False
+...
+```
+
+Pro jednoduché porovnání lze v praxi použít také:
+
+```python
+not_electronics = df[
+    df["category"] != "Electronics"
+]
+```
+
+To je v tomto případě čitelnější.
+
+`~` se hodí zejména při negaci složitějších podmínek nebo například `isin()`.
+
+---
+
+## Test 3 — `isin()` a `between()`
+
+### Zadání
+
+Nejprve vyber pouze produkty:
+
+```text
+Laptop
+Desk
+Office Chair
+```
+
+Výsledek ulož do:
+
+```python
+selected_products
+```
+
+Potom z těchto vybraných produktů ponech pouze objednávky, kde je `total` mezi:
+
+```text
+15000 až 30000 včetně
+```
+
+Výsledek ulož do:
+
+```python
+selected_mid_value
+```
+
+Použij:
+
+```python
+isin()
+between()
+```
+
+### Řešení
+
+```python
+selected_products = df[
+    df["product"].isin([
+        "Laptop",
+        "Desk",
+        "Office Chair"
+    ])
+]
+
+selected_mid_value = selected_products[
+    selected_products["total"].between(
+        15000,
+        30000
+    )
+]
+```
+
+### Vysvětlení
+
+Metoda:
+
+```python
+isin()
+```
+
+ověřuje, zda se hodnota nachází mezi zadanými hodnotami.
+
+Například:
+
+```python
+df["product"].isin([
+    "Laptop",
+    "Desk",
+    "Office Chair"
+])
+```
+
+je podobné SQL:
+
+```sql
+WHERE product IN ('Laptop', 'Desk', 'Office Chair')
+```
+
+Metoda:
+
+```python
+between(15000, 30000)
+```
+
+znamená:
+
+```text
+15000 <= total <= 30000
+```
+
+Ve výchozím nastavení jsou tedy obě krajní hodnoty zahrnuté.
+
+Důležitý je zde princip práce s novým DataFrame.
+
+Po:
+
+```python
+selected_products = df[...]
+```
+
+existují dva různé DataFrame:
+
+```text
+df
+→ původní DataFrame
+
+selected_products
+→ nový filtrovaný DataFrame
+```
+
+Proto musí druhá boolean maska vzniknout nad stejným DataFrame, který následně filtrujeme:
+
+```python
+selected_mid_value = selected_products[
+    selected_products["total"].between(15000, 30000)
+]
+```
+
+Nesprávně by bylo:
+
+```python
+selected_mid_value = df[
+    selected_products["total"].between(15000, 30000)
+]
+```
+
+Boolean maska zde vzniká z `selected_products`, ale snažíme se ji aplikovat na `df`.
+
+Jejich indexy se nemusí shodovat a Pandas může vrátit chybu:
+
+```text
+Unalignable boolean Series provided as indexer
+```
+
+Princip:
+
+```text
+df
 → isin()
-→ loc a iloc
+→ selected_products
+→ between()
+→ selected_mid_value
 ```
+
+### Varianty `between()`
+
+```python
+inclusive="both"
+```
+
+zahrne oba kraje.
+
+```python
+inclusive="left"
+```
+
+zahrne pouze levý kraj.
+
+```python
+inclusive="right"
+```
+
+zahrne pouze pravý kraj.
+
+```python
+inclusive="neither"
+```
+
+nezahrne žádný kraj.
+
+Například:
+
+```python
+df["total"].between(
+    15000,
+    30000,
+    inclusive="neither"
+)
+```
+
+znamená:
+
+```text
+15000 < total < 30000
+```
+
+---
+
+## Test 4 — Výběr pomocí `loc`
+
+### Zadání
+
+Pomocí `loc` vyber:
+
+* pouze řádky, kde `total > 10000`
+* pouze sloupce:
+
+  * `order_id`
+  * `product`
+  * `category`
+  * `total`
+
+Výsledek ulož do:
+
+```python
+high_value_summary
+```
+
+### Řešení
+
+```python
+high_value_summary = df.loc[
+    df["total"] > 10000,
+    ["order_id", "product", "category", "total"]
+]
+```
+
+### Vysvětlení
+
+Základní syntaxe `loc` je:
+
+```python
+df.loc[řádky, sloupce]
+```
+
+První část:
+
+```python
+df["total"] > 10000
+```
+
+určuje, které **řádky** budou vybrány.
+
+Druhá část:
+
+```python
+["order_id", "product", "category", "total"]
+```
+
+je `list` názvů sloupců, které chceme zachovat.
+
+Princip:
+
+```text
+df.loc[
+    podmínka pro řádky,
+    seznam sloupců
+]
+```
+
+SQL analogie:
+
+```sql
+SELECT
+    order_id,
+    product,
+    category,
+    total
+FROM orders
+WHERE total > 10000;
+```
+
+Pro zapamatování:
+
+```text
+loc
+
+řádky   → podobné WHERE
+sloupce → podobné SELECT
+```
+
+Pokud chceme filtrovat pouze řádky a zachovat všechny sloupce, můžeme použít:
+
+```python
+df.loc[df["total"] > 10000]
+```
+
+---
+
+## Test 5 — `iloc` a `loc`
+
+### Zadání
+
+Nejprve pomocí `iloc` vyber:
+
+* prvních 5 řádků
+* sloupce na pozicích `1`, `2`, `3`, `4`
+
+Výsledek ulož do:
+
+```python
+first_five_selected
+```
+
+Potom pomocí `loc` vyber z původního DataFrame:
+
+* řádky, kde `category == "Furniture"`
+* řádky, kde zároveň `total > 10000`
+* pouze sloupce:
+
+  * `product`
+  * `quantity`
+  * `total`
+
+Výsledek ulož do:
+
+```python
+furniture_summary
+```
+
+### Řešení
+
+```python
+first_five_selected = df.iloc[
+    0:5,
+    1:5
+]
+
+furniture_summary = df.loc[
+    (df["category"] == "Furniture")
+    & (df["total"] > 10000),
+    ["product", "quantity", "total"]
+]
+```
+
+### Vysvětlení
+
+`iloc` pracuje s **číselnými pozicemi** řádků a sloupců.
+
+Základní syntaxe:
+
+```python
+df.iloc[řádky, sloupce]
+```
+
+Například:
+
+```python
+df.iloc[0:5, 1:5]
+```
+
+znamená:
+
+```text
+řádky:
+0, 1, 2, 3, 4
+
+sloupce:
+1, 2, 3, 4
+```
+
+U slicingu platí:
+
+```text
+start → zahrnuje se
+stop  → nezahrnuje se
+```
+
+Proto:
+
+```python
+0:5
+```
+
+znamená:
+
+```text
+0, 1, 2, 3, 4
+```
+
+a:
+
+```python
+1:5
+```
+
+znamená:
+
+```text
+1, 2, 3, 4
+```
+
+### `loc` vs. `iloc`
+
+```text
+loc
+→ výběr podle názvů a podmínek
+
+iloc
+→ výběr podle číselných pozic
+```
+
+Například:
+
+```python
+df.loc[
+    df["category"] == "Furniture",
+    ["product", "total"]
+]
+```
+
+vybírá podle názvu a podmínky.
+
+Naopak:
+
+```python
+df.iloc[
+    0:5,
+    1:3
+]
+```
+
+vybírá podle pozic.
+
+### Důležitý princip nového DataFrame
+
+Po:
+
+```python
+first_five_selected = df.iloc[
+    0:5,
+    1:5
+]
+```
+
+obsahuje `first_five_selected` pouze sloupce na pozicích:
+
+```text
+1
+2
+3
+4
+```
+
+V našem datasetu:
+
+```text
+1 → product
+2 → category
+3 → quantity
+4 → unit_price
+```
+
+Sloupec:
+
+```text
+total
+```
+
+je na pozici `6`, takže v `first_five_selected` není.
+
+Proto by nefungovalo:
+
+```python
+first_five_selected["total"]
+```
+
+Pandas vrátí:
+
+```text
+KeyError: 'total'
+```
+
+Pokud bychom chtěli vytvořit nový DataFrame obsahující například pozice:
+
+```text
+1, 2, 3, 6
+```
+
+můžeme `iloc` předat list konkrétních pozic:
+
+```python
+first_five_selected = df.iloc[
+    0:5,
+    [1, 2, 3, 6]
+]
+```
+
+Výsledkem budou sloupce:
+
+```text
+product
+category
+quantity
+total
+```
+
+Potom by bylo možné pokračovat přímo nad tímto novým DataFrame:
+
+```python
+furniture_summary = first_five_selected.loc[
+    (first_five_selected["category"] == "Furniture")
+    & (first_five_selected["total"] > 10000),
+    ["product", "quantity", "total"]
+]
+```
+
+---
+
