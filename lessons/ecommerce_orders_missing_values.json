@@ -1,0 +1,122 @@
+[
+  {
+    "order_id": 1001,
+    "date": "2026-08-01",
+    "product": "Laptop",
+    "category": "Electronics",
+    "quantity": 1,
+    "unit_price": 24500,
+    "region": "CZ",
+    "customer_type": "B2C"
+  },
+  {
+    "order_id": 1002,
+    "date": "2026-08-02",
+    "product": "Desk",
+    "category": "Furniture",
+    "quantity": 2,
+    "unit_price": 7200,
+    "region": "CZ",
+    "customer_type": "B2B"
+  },
+  {
+    "order_id": 1003,
+    "date": "2026-08-03",
+    "product": "Monitor",
+    "category": "Electronics",
+    "quantity": 2,
+    "unit_price": 6800,
+    "region": "SK",
+    "customer_type": "B2C"
+  },
+  {
+    "order_id": 1004,
+    "date": "2026-08-04",
+    "product": "Office Chair",
+    "category": "Furniture",
+    "quantity": 4,
+    "unit_price": 3900,
+    "region": "CZ",
+    "customer_type": "B2B"
+  },
+  {
+    "order_id": 1005,
+    "date": "2026-08-05",
+    "product": "Keyboard",
+    "category": "Electronics",
+    "quantity": 3,
+    "unit_price": 1800,
+    "region": null,
+    "customer_type": "B2C"
+  },
+  {
+    "order_id": 1006,
+    "date": "2026-08-06",
+    "product": "Bookshelf",
+    "category": "Furniture",
+    "quantity": null,
+    "unit_price": 5200,
+    "region": "SK",
+    "customer_type": "B2B"
+  },
+  {
+    "order_id": 1007,
+    "date": "2026-08-07",
+    "product": "Mouse",
+    "category": "Electronics",
+    "quantity": 5,
+    "unit_price": null,
+    "region": "CZ",
+    "customer_type": "B2C"
+  },
+  {
+    "order_id": 1008,
+    "date": "2026-08-08",
+    "product": null,
+    "category": "Furniture",
+    "quantity": 1,
+    "unit_price": 12500,
+    "region": "SK",
+    "customer_type": "B2B"
+  },
+  {
+    "order_id": 1009,
+    "date": "2026-08-09",
+    "product": "Monitor",
+    "category": "Electronics",
+    "quantity": 3,
+    "unit_price": 6800,
+    "region": "CZ",
+    "customer_type": null
+  },
+  {
+    "order_id": 1010,
+    "date": null,
+    "product": "Desk",
+    "category": "Furniture",
+    "quantity": 1,
+    "unit_price": 7200,
+    "region": "CZ",
+    "customer_type": "B2C"
+  },
+  {
+    "order_id": 1011,
+    "date": "2026-08-11",
+    "product": "Laptop",
+    "category": null,
+    "quantity": 1,
+    "unit_price": 24500,
+    "region": "SK",
+    "customer_type": "B2B"
+  },
+  {
+    "order_id": 1012,
+    "date": "2026-08-12",
+    "product": "Office Chair",
+    "category": "Furniture",
+    "quantity": 2,
+    "unit_price": 3900,
+    "region": "CZ",
+    "customer_type": "B2C"
+  }
+]
