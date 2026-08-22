@@ -27,9 +27,7 @@ import pandas as pd
 df = pd.read_csv("ecommerce_sales_analysis.csv")
 
 print(df.head())
-
 print(df.shape)
-
 print(df.columns)
 
 df.info()
@@ -110,25 +108,17 @@ Výsledky ulož do proměnných a vypiš.
 df["total"] = df["quantity"] * df["unit_price"]
 
 total_revenue = df["total"].sum()
-
 avg_order = df["total"].mean()
-
 max_order_value = df["total"].max()
-
 min_order_value = df["total"].min()
 
 print("Celkové tržby:", total_revenue, "Kč")
-
 print("Průměrná objednávka:", avg_order, "Kč")
-
 print("Nejnižší objednávka:", min_order_value, "Kč")
-
 print("Nejvyšší objednávka:", max_order_value, "Kč")
 ```
 
 ### Vysvětlení
-
-Tento zápis:
 
 ```python
 df["total"] = df["quantity"] * df["unit_price"]
@@ -208,9 +198,7 @@ True
 ...
 ```
 
-Jedná se o takzvanou **boolean masku**.
-
-Boolean maska určuje, které řádky budou zachovány.
+Jedná se o **boolean masku**.
 
 Použití:
 
@@ -260,7 +248,6 @@ sorted_orders = df.sort_values(
 )
 
 print(sorted_orders.head())
-
 print(sorted_orders.head(1))
 ```
 
@@ -283,9 +270,9 @@ Po seřazení je proto nejvyšší objednávka na prvním místě.
 sorted_orders.head(1)
 ```
 
-zobrazí první řádek výsledku.
+vrátí celý první řádek.
 
-Důležitý rozdíl:
+Naopak:
 
 ```python
 sorted_orders["total"].max()
@@ -293,58 +280,9 @@ sorted_orders["total"].max()
 
 vrátí pouze nejvyšší hodnotu `total`.
 
-Například:
+Pandas po řazení zachovává původní indexy.
 
-```text
-75000
-```
-
-Ale:
-
-```python
-sorted_orders.head(1)
-```
-
-vrátí celý řádek objednávky, takže vidíme i produkt, kategorii, množství a další údaje.
-
-### Index vs. pořadí řádku
-
-Po použití:
-
-```python
-df.sort_values(...)
-```
-
-Pandas řádky přesune, ale jejich původní indexy zachová.
-
-Výsledek může například vypadat:
-
-```text
-   product       total
-7  Laptop        50000
-1  Chair         30000
-4  Desk          25000
-```
-
-První řádek zde má index `7`.
-
-```python
-head(1)
-```
-
-znamená:
-
-```text
-zobraz první jeden řádek podle aktuálního pořadí
-```
-
-Neznamená:
-
-```text
-zobraz řádek s indexem 1
-```
-
-Pokud bychom chtěli index po seřazení vytvořit znovu:
+Pokud chceme index vytvořit znovu:
 
 ```python
 sorted_orders = sorted_orders.reset_index(drop=True)
@@ -440,26 +378,6 @@ sorted_orders = above_average_orders.sort_values(
 
 Řadíme pouze objednávky, které už prošly filtrem.
 
-Pokud bychom napsali:
-
-```python
-sorted_orders = df.sort_values(
-    by="total",
-    ascending=False
-)
-```
-
-seřadili bychom celý původní dataset.
-
-Při exportu proto také používáme:
-
-```python
-sorted_orders.to_csv(...)
-sorted_orders.to_json(...)
-```
-
-aby se do souborů uložil skutečný finální výsledek analýzy.
-
 ---
 
 # Lekce 7
@@ -468,18 +386,16 @@ aby se do souborů uložil skutečný finální výsledek analýzy.
 
 ### Zadání
 
-Vyber objednávky, které současně splňují obě podmínky:
+Vyber objednávky, které současně splňují:
 
-* `category == "Furniture"`
-* `total > 15000`
+- `category == "Furniture"`
+- `total > 15000`
 
 Výsledek ulož do:
 
 ```python
 furniture_high_value
 ```
-
-Použij operátor `&`.
 
 ### Řešení
 
@@ -492,7 +408,7 @@ furniture_high_value = df[
 
 ### Vysvětlení
 
-V Pandas se při kombinování boolean podmínek nad `Series` používá:
+V pandas používáme při kombinaci boolean podmínek:
 
 ```text
 & → AND
@@ -501,45 +417,7 @@ V Pandas se při kombinování boolean podmínek nad `Series` používá:
 ^ → XOR
 ```
 
-Na rozdíl od běžného Pythonu zde nepoužíváme:
-
-```text
-and
-or
-not
-```
-
-Každá podmínka musí být při použití `&` nebo `|` uzavřena do vlastních závorek:
-
-```python
-(df["category"] == "Furniture")
-&
-(df["total"] > 15000)
-```
-
-Samotné podmínky vytvářejí boolean masky:
-
-```text
-True
-False
-True
-...
-```
-
-Vnější:
-
-```python
-df[...]
-```
-
-potom tuto masku aplikuje na celý DataFrame.
-
-SQL obdoba:
-
-```sql
-WHERE category = 'Furniture'
-  AND total > 15000
-```
+Každá podmínka má být uzavřena ve vlastních závorkách.
 
 ---
 
@@ -549,30 +427,28 @@ WHERE category = 'Furniture'
 
 Vytvoř dva filtry.
 
-První filtr vybere objednávky, které splňují alespoň jednu z podmínek:
+První vybere objednávky, kde platí alespoň jedna podmínka:
 
-* `quantity >= 4`
-* `total > 20000`
+- `quantity >= 4`
+- `total > 20000`
 
-Výsledek ulož do:
+Výsledek:
 
 ```python
 high_quantity_or_value
 ```
 
-Druhý filtr vybere všechny objednávky, které nejsou z kategorie:
+Druhý vybere objednávky, které nejsou z kategorie:
 
 ```text
 Electronics
 ```
 
-Výsledek ulož do:
+Výsledek:
 
 ```python
 not_electronics
 ```
-
-U druhého filtru použij operátor `~`.
 
 ### Řešení
 
@@ -589,63 +465,12 @@ not_electronics = df[
 
 ### Vysvětlení
 
-Operátor:
-
-```python
-|
-```
-
-znamená OR.
-
-Řádek tedy projde filtrem, pokud platí alespoň jedna podmínka.
-
 ```text
-quantity >= 4
-NEBO
-total > 20000
+| → OR
+~ → NOT
 ```
 
-Operátor:
-
-```python
-~
-```
-
-neznamená porovnání.
-
-Neguje již vytvořenou boolean podmínku.
-
-Nejprve:
-
-```python
-df["category"] == "Electronics"
-```
-
-vytvoří například:
-
-```text
-True
-False
-True
-...
-```
-
-Potom:
-
-```python
-~(df["category"] == "Electronics")
-```
-
-hodnoty obrátí:
-
-```text
-False
-True
-False
-...
-```
-
-Pro jednoduché porovnání lze v praxi použít také:
+Jednodušší varianta druhého filtru:
 
 ```python
 not_electronics = df[
@@ -653,17 +478,13 @@ not_electronics = df[
 ]
 ```
 
-To je v tomto případě čitelnější.
-
-`~` se hodí zejména při negaci složitějších podmínek nebo například `isin()`.
-
 ---
 
 ## Test 3 — `isin()` a `between()`
 
 ### Zadání
 
-Nejprve vyber pouze produkty:
+Vyber produkty:
 
 ```text
 Laptop
@@ -677,23 +498,16 @@ Výsledek ulož do:
 selected_products
 ```
 
-Potom z těchto vybraných produktů ponech pouze objednávky, kde je `total` mezi:
+Potom z nich vyber objednávky, kde je `total` mezi:
 
 ```text
 15000 až 30000 včetně
 ```
 
-Výsledek ulož do:
+Výsledek:
 
 ```python
 selected_mid_value
-```
-
-Použij:
-
-```python
-isin()
-between()
 ```
 
 ### Řešení
@@ -717,31 +531,11 @@ selected_mid_value = selected_products[
 
 ### Vysvětlení
 
-Metoda:
-
 ```python
 isin()
 ```
 
-ověřuje, zda se hodnota nachází mezi zadanými hodnotami.
-
-Například:
-
-```python
-df["product"].isin([
-    "Laptop",
-    "Desk",
-    "Office Chair"
-])
-```
-
-je podobné SQL:
-
-```sql
-WHERE product IN ('Laptop', 'Desk', 'Office Chair')
-```
-
-Metoda:
+ověřuje, zda je hodnota v zadaném seznamu.
 
 ```python
 between(15000, 30000)
@@ -753,101 +547,7 @@ znamená:
 15000 <= total <= 30000
 ```
 
-Ve výchozím nastavení jsou tedy obě krajní hodnoty zahrnuté.
-
-Důležitý je zde princip práce s novým DataFrame.
-
-Po:
-
-```python
-selected_products = df[...]
-```
-
-existují dva různé DataFrame:
-
-```text
-df
-→ původní DataFrame
-
-selected_products
-→ nový filtrovaný DataFrame
-```
-
-Proto musí druhá boolean maska vzniknout nad stejným DataFrame, který následně filtrujeme:
-
-```python
-selected_mid_value = selected_products[
-    selected_products["total"].between(15000, 30000)
-]
-```
-
-Nesprávně by bylo:
-
-```python
-selected_mid_value = df[
-    selected_products["total"].between(15000, 30000)
-]
-```
-
-Boolean maska zde vzniká z `selected_products`, ale snažíme se ji aplikovat na `df`.
-
-Jejich indexy se nemusí shodovat a Pandas může vrátit chybu:
-
-```text
-Unalignable boolean Series provided as indexer
-```
-
-Princip:
-
-```text
-df
-→ isin()
-→ selected_products
-→ between()
-→ selected_mid_value
-```
-
-### Varianty `between()`
-
-```python
-inclusive="both"
-```
-
-zahrne oba kraje.
-
-```python
-inclusive="left"
-```
-
-zahrne pouze levý kraj.
-
-```python
-inclusive="right"
-```
-
-zahrne pouze pravý kraj.
-
-```python
-inclusive="neither"
-```
-
-nezahrne žádný kraj.
-
-Například:
-
-```python
-df["total"].between(
-    15000,
-    30000,
-    inclusive="neither"
-)
-```
-
-znamená:
-
-```text
-15000 < total < 30000
-```
+Druhou masku vytváříme nad `selected_products`, protože právě tento DataFrame dále filtrujeme.
 
 ---
 
@@ -857,15 +557,14 @@ znamená:
 
 Pomocí `loc` vyber:
 
-* pouze řádky, kde `total > 10000`
-* pouze sloupce:
+- řádky, kde `total > 10000`
+- sloupce:
+  - `order_id`
+  - `product`
+  - `category`
+  - `total`
 
-  * `order_id`
-  * `product`
-  * `category`
-  * `total`
-
-Výsledek ulož do:
+Výsledek:
 
 ```python
 high_value_summary
@@ -882,62 +581,15 @@ high_value_summary = df.loc[
 
 ### Vysvětlení
 
-Základní syntaxe `loc` je:
+Základ:
 
 ```python
 df.loc[řádky, sloupce]
 ```
 
-První část:
-
-```python
-df["total"] > 10000
-```
-
-určuje, které **řádky** budou vybrány.
-
-Druhá část:
-
-```python
-["order_id", "product", "category", "total"]
-```
-
-je `list` názvů sloupců, které chceme zachovat.
-
-Princip:
-
 ```text
-df.loc[
-    podmínka pro řádky,
-    seznam sloupců
-]
-```
-
-SQL analogie:
-
-```sql
-SELECT
-    order_id,
-    product,
-    category,
-    total
-FROM orders
-WHERE total > 10000;
-```
-
-Pro zapamatování:
-
-```text
-loc
-
-řádky   → podobné WHERE
-sloupce → podobné SELECT
-```
-
-Pokud chceme filtrovat pouze řádky a zachovat všechny sloupce, můžeme použít:
-
-```python
-df.loc[df["total"] > 10000]
+řádky   → podobné SQL WHERE
+sloupce → podobné SQL SELECT
 ```
 
 ---
@@ -946,12 +598,12 @@ df.loc[df["total"] > 10000]
 
 ### Zadání
 
-Nejprve pomocí `iloc` vyber:
+Pomocí `iloc` vyber:
 
-* prvních 5 řádků
-* sloupce na pozicích `1`, `2`, `3`, `4`
+- prvních 5 řádků
+- sloupce na pozicích `1`, `2`, `3`, `4`
 
-Výsledek ulož do:
+Výsledek:
 
 ```python
 first_five_selected
@@ -959,15 +611,14 @@ first_five_selected
 
 Potom pomocí `loc` vyber z původního DataFrame:
 
-* řádky, kde `category == "Furniture"`
-* řádky, kde zároveň `total > 10000`
-* pouze sloupce:
+- `category == "Furniture"`
+- `total > 10000`
+- sloupce:
+  - `product`
+  - `quantity`
+  - `total`
 
-  * `product`
-  * `quantity`
-  * `total`
-
-Výsledek ulož do:
+Výsledek:
 
 ```python
 furniture_summary
@@ -990,31 +641,13 @@ furniture_summary = df.loc[
 
 ### Vysvětlení
 
-`iloc` pracuje s **číselnými pozicemi** řádků a sloupců.
-
-Základní syntaxe:
+`iloc` pracuje s číselnými pozicemi:
 
 ```python
 df.iloc[řádky, sloupce]
 ```
 
-Například:
-
-```python
-df.iloc[0:5, 1:5]
-```
-
-znamená:
-
-```text
-řádky:
-0, 1, 2, 3, 4
-
-sloupce:
-1, 2, 3, 4
-```
-
-U slicingu platí:
+U slicingu:
 
 ```text
 start → zahrnuje se
@@ -1033,7 +666,7 @@ znamená:
 0, 1, 2, 3, 4
 ```
 
-a:
+A:
 
 ```python
 1:5
@@ -1045,120 +678,395 @@ znamená:
 1, 2, 3, 4
 ```
 
-### `loc` vs. `iloc`
+Rozdíl:
 
 ```text
 loc
-→ výběr podle názvů a podmínek
+→ názvy a podmínky
 
 iloc
-→ výběr podle číselných pozic
+→ číselné pozice
 ```
 
-Například:
+---
+
+# Lekce 8
+
+## Test 1 — Kontrola chybějících hodnot
+
+### Zadání
+
+U DataFrame:
 
 ```python
-df.loc[
-    df["category"] == "Furniture",
-    ["product", "total"]
-]
+orders
 ```
 
-vybírá podle názvu a podmínky.
+zjisti počet chybějících hodnot v každém sloupci a výsledek vypiš.
+
+### Řešení
+
+```python
+print(
+    orders.isna().sum()
+)
+```
+
+### Vysvětlení
+
+```python
+orders.isna()
+```
+
+vrací:
+
+```text
+True  → hodnota chybí
+False → hodnota nechybí
+```
+
+Následné:
+
+```python
+.sum()
+```
+
+spočítá počet hodnot `True` v jednotlivých sloupcích.
+
+```text
+True  = 1
+False = 0
+```
+
+Proto:
+
+```python
+orders.isna().sum()
+```
+
+vrací počet chybějících hodnot v každém sloupci.
+
+---
+
+## Test 2 — Odstranění řádků podle konkrétního sloupce
+
+### Zadání
+
+Vytvoř nový DataFrame:
+
+```python
+orders_clean
+```
+
+ve kterém odstraníš pouze řádky, kde chybí hodnota ve sloupci:
+
+```text
+product
+```
+
+Použij:
+
+```python
+dropna()
+subset
+```
+
+### Řešení
+
+```python
+orders_clean = orders.dropna(
+    subset=["product"]
+)
+```
+
+### Vysvětlení
+
+Samotné:
+
+```python
+orders.dropna()
+```
+
+by odstranilo každý řádek obsahující alespoň jednu chybějící hodnotu.
+
+Pomocí:
+
+```python
+subset=["product"]
+```
+
+říkáme Pandas:
+
+```text
+při rozhodování o odstranění řádku
+kontroluj pouze sloupec product
+```
+
+---
+
+## Test 3 — Doplnění textové hodnoty
+
+### Zadání
+
+1. vytvoř kopii `orders` do:
+
+```python
+orders_filled
+```
+
+2. ve sloupci:
+
+```text
+region
+```
+
+nahraď chybějící hodnoty textem:
+
+```text
+Unknown
+```
+
+### Řešení
+
+```python
+orders_filled = orders.copy()
+
+orders_filled["region"] = (
+    orders_filled["region"]
+    .fillna("Unknown")
+)
+```
+
+### Vysvětlení
+
+```python
+orders.copy()
+```
+
+vytvoří samostatnou kopii DataFrame.
+
+Rozdíl:
+
+```python
+orders_filled = orders
+```
+
+znamená:
+
+```text
+dvě proměnné
+→ jeden DataFrame
+```
 
 Naopak:
 
 ```python
-df.iloc[
-    0:5,
-    1:3
-]
+orders_filled = orders.copy()
 ```
 
-vybírá podle pozic.
+znamená:
 
-### Důležitý princip nového DataFrame
+```text
+orders
+→ původní DataFrame
 
-Po:
+orders_filled
+→ samostatná kopie
+```
+
+Tento zápis:
 
 ```python
-first_five_selected = df.iloc[
-    0:5,
-    1:5
-]
+orders_filled["region"]
 ```
 
-obsahuje `first_five_selected` pouze sloupce na pozicích:
-
-```text
-1
-2
-3
-4
-```
-
-V našem datasetu:
-
-```text
-1 → product
-2 → category
-3 → quantity
-4 → unit_price
-```
-
-Sloupec:
-
-```text
-total
-```
-
-je na pozici `6`, takže v `first_five_selected` není.
-
-Proto by nefungovalo:
+vybere pouze sloupec `region`.
 
 ```python
-first_five_selected["total"]
+.fillna("Unknown")
 ```
 
-Pandas vrátí:
+v něm nahradí chybějící hodnoty.
 
-```text
-KeyError: 'total'
-```
-
-Pokud bychom chtěli vytvořit nový DataFrame obsahující například pozice:
-
-```text
-1, 2, 3, 6
-```
-
-můžeme `iloc` předat list konkrétních pozic:
+Důležité je výsledek přiřadit zpět do stejného sloupce:
 
 ```python
-first_five_selected = df.iloc[
-    0:5,
-    [1, 2, 3, 6]
-]
+orders_filled["region"] = ...
 ```
 
-Výsledkem budou sloupce:
-
-```text
-product
-category
-quantity
-total
-```
-
-Potom by bylo možné pokračovat přímo nad tímto novým DataFrame:
+Ne:
 
 ```python
-furniture_summary = first_five_selected.loc[
-    (first_five_selected["category"] == "Furniture")
-    & (first_five_selected["total"] > 10000),
-    ["product", "quantity", "total"]
-]
+orders_filled = ...
 ```
+
+protože tím bychom celý DataFrame přepsali výslednou `Series`.
+
+---
+
+## Test 4 — Doplnění číselné hodnoty mediánem
+
+### Zadání
+
+1. vytvoř kopii `orders` do:
+
+```python
+orders_filled
+```
+
+2. ve sloupci:
+
+```text
+unit_price
+```
+
+nahraď chybějící hodnotu mediánem tohoto sloupce.
+
+### Řešení
+
+```python
+orders_filled = orders.copy()
+
+orders_filled["unit_price"] = (
+    orders_filled["unit_price"]
+    .fillna(
+        orders_filled["unit_price"].median()
+    )
+)
+```
+
+### Alternativní řešení s mezikrokem
+
+```python
+orders_filled = orders.copy()
+
+median_price = (
+    orders_filled["unit_price"].median()
+)
+
+orders_filled["unit_price"] = (
+    orders_filled["unit_price"]
+    .fillna(median_price)
+)
+```
+
+### Vysvětlení
+
+Nejprve:
+
+```python
+orders_filled["unit_price"].median()
+```
+
+spočítá medián sloupce `unit_price`.
+
+Potom:
+
+```python
+fillna(...)
+```
+
+použije tuto hodnotu jako náhradu za `NaN`.
+
+Princip:
+
+```text
+vyber sloupec
+→ spočítej medián
+→ použij ho ve fillna()
+```
+
+Mezikrok:
+
+```python
+median_price = ...
+```
+
+není nutný, ale může zlepšit čitelnost a pomoci při pochopení logiky.
+
+---
+
+## Test 5 — Kompletní cleaning workflow
+
+### Zadání
+
+Vytvoř nový DataFrame:
+
+```python
+orders_clean
+```
+
+jako kopii `orders`.
+
+Potom:
+
+1. doplň chybějící `region` hodnotou `"Unknown"`
+2. doplň chybějící `unit_price` mediánem
+3. odstraň řádky, kde chybí `product`
+4. vypiš počet zbývajících chybějících hodnot v každém sloupci
+
+### Řešení
+
+```python
+orders_clean = orders.copy()
+
+orders_clean["region"] = (
+    orders_clean["region"]
+    .fillna("Unknown")
+)
+
+orders_clean["unit_price"] = (
+    orders_clean["unit_price"]
+    .fillna(
+        orders_clean["unit_price"].median()
+    )
+)
+
+orders_clean = orders_clean.dropna(
+    subset=["product"]
+)
+
+print(
+    orders_clean.isna().sum()
+)
+```
+
+### Vysvětlení
+
+Správné pořadí:
+
+```text
+původní data
+→ vytvoření kopie
+→ doplnění textové hodnoty
+→ doplnění číselné hodnoty
+→ odstranění nežádoucího řádku
+→ kontrola výsledku
+```
+
+Důležité je pokračovat nad stejným pracovním DataFrame:
+
+```python
+orders_clean
+```
+
+Správně:
+
+```python
+orders_clean = orders_clean.dropna(
+    subset=["product"]
+)
+```
+
+Ne:
+
+```python
+orders_clean = orders.dropna(
+    subset=["product"]
+)
+```
+
+Ve druhém případě bychom se vrátili k původním datům a přišli o předchozí změny provedené v `orders_clean`.
 
 ---
 
