@@ -1070,3 +1070,614 @@ Ve druhém případě bychom se vrátili k původním datům a přišli o předc
 
 ---
 
+# Lekce 9
+
+## Test 1 — Chybějící hodnoty
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+import pandas as pd
+
+data = {
+    "order_id": [1001, 1002, 1003, 1004, 1005],
+    "product": ["Laptop", "Monitor", None, "Desk", "Mouse"],
+    "quantity": [2, None, 1, 3, None],
+    "unit_price": [25000, 7000, 15000, 12000, 800]
+}
+
+df = pd.DataFrame(data)
+```
+
+Proveď následující:
+
+1. zjisti počet chybějících hodnot v každém sloupci
+2. odstraň řádky, kde chybí `product`
+3. chybějící hodnoty ve sloupci `quantity` nahraď hodnotou `1`
+4. výsledek ulož do:
+
+```python
+clean_df
+```
+
+### Řešení
+
+```python
+print(df.isna().sum())
+
+df = df.dropna(
+    subset=["product"]
+)
+
+df["quantity"] = (
+    df["quantity"]
+    .fillna(1)
+)
+
+clean_df = df
+```
+
+### Vysvětlení
+
+```python
+df.isna().sum()
+```
+
+zjistí počet chybějících hodnot v jednotlivých sloupcích.
+
+```python
+df.dropna(
+    subset=["product"]
+)
+```
+
+odstraní pouze řádky, kde chybí hodnota ve sloupci `product`.
+
+Parametr:
+
+```python
+subset=["product"]
+```
+
+říká Pandas, že při rozhodování o odstranění řádku má kontrolovat pouze tento sloupec.
+
+```python
+df["quantity"].fillna(1)
+```
+
+nahradí chybějící hodnoty ve sloupci `quantity` číslem `1`.
+
+Důležitý rozdíl:
+
+```python
+1
+```
+
+je číslo.
+
+```python
+"1"
+```
+
+je textový řetězec.
+
+Proto při práci s číselným sloupcem používáme:
+
+```python
+.fillna(1)
+```
+
+---
+
+## Test 2 — Duplicity
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+data = {
+    "order_id": [1001, 1002, 1002, 1003, 1004, 1004],
+    "product": ["Laptop", "Monitor", "Monitor", "Desk", "Mouse", "Mouse"],
+    "quantity": [1, 2, 2, 1, 3, 3]
+}
+
+df = pd.DataFrame(data)
+```
+
+Proveď následující:
+
+1. zjisti, které řádky jsou duplicitní
+2. zjisti počet duplicitních řádků
+3. odstraň duplicity
+4. výsledek ulož do:
+
+```python
+clean_df
+```
+
+### Řešení
+
+```python
+print(
+    df[df.duplicated()]
+)
+
+print(
+    df.duplicated().sum()
+)
+
+clean_df = df.drop_duplicates()
+```
+
+### Vysvětlení
+
+```python
+df.duplicated()
+```
+
+vrací boolean masku:
+
+```text
+False
+False
+True
+False
+False
+True
+```
+
+Hodnota:
+
+```text
+True
+```
+
+znamená, že daný řádek je duplicitní vůči některému předchozímu řádku.
+
+Použití:
+
+```python
+df[df.duplicated()]
+```
+
+zobrazí pouze duplicitní řádky.
+
+```python
+df.duplicated().sum()
+```
+
+spočítá jejich počet.
+
+Platí:
+
+```text
+True  = 1
+False = 0
+```
+
+Duplicity odstraníme pomocí:
+
+```python
+df.drop_duplicates()
+```
+
+Důležité je výsledek uložit:
+
+```python
+clean_df = df.drop_duplicates()
+```
+
+Samotné:
+
+```python
+df.drop_duplicates()
+```
+
+vytvoří nový DataFrame, ale původní `df` automaticky nezmění.
+
+---
+
+## Test 3 — Datové typy
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+data = {
+    "order_id": ["1001", "1002", "1003"],
+    "quantity": ["2", "3", "1"],
+    "unit_price": ["25000.5", "7000", "12000"]
+}
+
+df = pd.DataFrame(data)
+```
+
+Všechny hodnoty jsou načtené jako text.
+
+Převeď:
+
+1. `order_id` na celé číslo
+2. `quantity` na celé číslo
+3. `unit_price` na desetinné číslo
+4. zobraz výsledné datové typy sloupců
+
+### Řešení
+
+```python
+df["order_id"] = df["order_id"].astype(int)
+
+df["quantity"] = df["quantity"].astype(int)
+
+df["unit_price"] = df["unit_price"].astype(float)
+
+print(df.dtypes)
+```
+
+### Vysvětlení
+
+Metoda:
+
+```python
+.astype()
+```
+
+slouží ke změně datového typu hodnot v Pandas objektu.
+
+Například:
+
+```python
+df["quantity"].astype(int)
+```
+
+převede celý sloupec `quantity` na celá čísla.
+
+```python
+int
+```
+
+znamená celé číslo.
+
+```python
+float
+```
+
+znamená desetinné číslo.
+
+Proto:
+
+```python
+df["unit_price"] = df["unit_price"].astype(float)
+```
+
+převede `unit_price` na desetinný číselný typ.
+
+Datové typy zobrazíme pomocí:
+
+```python
+df.dtypes
+```
+
+> Poznámka: `astype()` nebylo součástí původně procvičené látky Lekce 9. Tento test proto bereme jako doplňkový příklad převodu datových typů, nikoli jako požadovanou znalost z Lekce 9.
+
+---
+
+## Test 4 — Validace hodnot
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+data = {
+    "order_id": [1001, 1002, 1003, 1004, 1005],
+    "product": ["Laptop", "Monitor", "Desk", "Mouse", "Keyboard"],
+    "quantity": [2, -1, 3, 0, 5],
+    "unit_price": [25000, 7000, -12000, 800, 1500]
+}
+
+df = pd.DataFrame(data)
+```
+
+Business pravidla říkají:
+
+```text
+quantity > 0
+unit_price > 0
+```
+
+Vytvoř DataFrame:
+
+```python
+invalid_rows
+```
+
+který bude obsahovat všechny řádky, kde je:
+
+- `quantity` neplatné
+
+nebo
+
+- `unit_price` neplatné
+
+### Řešení
+
+```python
+invalid_rows = df[
+    (df["quantity"] <= 0)
+    | (df["unit_price"] <= 0)
+]
+```
+
+### Vysvětlení
+
+Business pravidla definují platné hodnoty:
+
+```text
+quantity > 0
+unit_price > 0
+```
+
+Neplatné hodnoty jsou tedy jejich opak:
+
+```text
+quantity <= 0
+unit_price <= 0
+```
+
+Proto použijeme:
+
+```python
+df["quantity"] <= 0
+```
+
+a:
+
+```python
+df["unit_price"] <= 0
+```
+
+Chceme najít řádek, kde je neplatná alespoň jedna z těchto hodnot.
+
+Proto používáme:
+
+```python
+|
+```
+
+což v Pandas znamená:
+
+```text
+OR
+```
+
+Každá podmínka musí být uzavřena ve vlastních kulatých závorkách:
+
+```python
+(df["quantity"] <= 0)
+| (df["unit_price"] <= 0)
+```
+
+Obecný zápis:
+
+```python
+df[
+    (podmínka_1)
+    | (podmínka_2)
+]
+```
+
+Pro `AND` bychom použili:
+
+```python
+df[
+    (podmínka_1)
+    & (podmínka_2)
+]
+```
+
+---
+
+## Test 5 — Kompletní cleaning workflow
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+data = {
+    "order_id": [1001, 1002, 1002, 1003, 1004, 1005],
+    "product": ["Laptop", "Monitor", "Monitor", None, "Desk", "Mouse"],
+    "quantity": [2, 1, 1, 3, None, -2],
+    "unit_price": [25000, 7000, 7000, 12000, 10000, 800]
+}
+
+df = pd.DataFrame(data)
+```
+
+Vytvoř čistý dataset.
+
+Postupně:
+
+1. zkontroluj chybějící hodnoty
+2. odstraň duplicity
+3. odstraň řádky, kde chybí `product`
+4. chybějící `quantity` nahraď hodnotou `1`
+5. ponech pouze řádky, kde platí:
+
+```python
+quantity > 0
+```
+
+6. vytvoř nový sloupec:
+
+```python
+total
+```
+
+jako:
+
+```text
+quantity × unit_price
+```
+
+7. výsledek ulož do:
+
+```python
+clean_df
+```
+
+8. nakonec zobraz výsledný DataFrame a jeho základní informace
+
+### Řešení
+
+```python
+print(
+    df.isna().sum()
+)
+
+df = df.drop_duplicates()
+
+df = df.dropna(
+    subset=["product"]
+)
+
+df["quantity"] = (
+    df["quantity"]
+    .fillna(1)
+)
+
+df = df[
+    df["quantity"] > 0
+]
+
+df["total"] = (
+    df["quantity"]
+    * df["unit_price"]
+)
+
+clean_df = df
+
+print(clean_df)
+
+clean_df.info()
+```
+
+### Vysvětlení
+
+Nejprve zkontrolujeme chybějící hodnoty:
+
+```python
+df.isna().sum()
+```
+
+Potom odstraníme duplicitní řádky:
+
+```python
+df = df.drop_duplicates()
+```
+
+Řádky bez produktu odstraníme pomocí:
+
+```python
+df = df.dropna(
+    subset=["product"]
+)
+```
+
+Chybějící množství doplníme číslem `1`:
+
+```python
+df["quantity"] = (
+    df["quantity"]
+    .fillna(1)
+)
+```
+
+Potom aplikujeme business validační pravidlo:
+
+```python
+df["quantity"] > 0
+```
+
+a ponecháme pouze platné řádky:
+
+```python
+df = df[
+    df["quantity"] > 0
+]
+```
+
+Nový sloupec:
+
+```python
+total
+```
+
+vytvoříme výpočtem po jednotlivých řádcích:
+
+```python
+df["total"] = (
+    df["quantity"]
+    * df["unit_price"]
+)
+```
+
+Nakonec pracovní DataFrame uložíme jako:
+
+```python
+clean_df = df
+```
+
+a provedeme závěrečnou kontrolu:
+
+```python
+print(clean_df)
+
+clean_df.info()
+```
+
+Celý workflow tedy odpovídá:
+
+```text
+raw data
+
+→ kontrola missing values
+
+→ odstranění duplicit
+
+→ řešení chybějících hodnot
+
+→ validace business pravidel
+
+→ odstranění neplatných řádků
+
+→ vytvoření odvozeného sloupce
+
+→ kontrola výsledku
+```
+
+Tento postup odpovídá běžnému principu:
+
+```text
+inspect
+→ clean
+→ validate
+→ transform
+→ verify
+```
+
+tedy:
+
+```text
+zkontrolovat
+→ vyčistit
+→ validovat
+→ transformovat
+→ ověřit
+```
+
+---
