@@ -4,46 +4,283 @@ Praktický tahák pro práci s daty v Pythonu pomocí knihovny `pandas`.
 
 ---
 
-# 1. Import pandas
+# 1. Importy
 
 ```python
 import pandas as pd
 ```
 
+Další používané knihovny:
+
+```python
+import sqlite3
+import requests
+```
+
 ```text
-pandas → knihovna pro práci s tabulkovými daty
-pd     → běžný alias
+pandas   → tabulková data
+sqlite3  → SQLite databáze
+requests → API / HTTP požadavky
 ```
 
 ---
 
-# 2. Načtení dat
+# 2. Data Sources & Ingestion
+
+## CSV
 
 ```python
 df = pd.read_csv("data.csv")
-df = pd.read_json("data.json")
-df = pd.read_excel("data.xlsx")
-df = pd.read_sql("SELECT * FROM orders", connection)
 ```
 
-Pro Excel může být potřeba:
+Vlastní oddělovač:
+
+```python
+df = pd.read_csv(
+    "data.csv",
+    sep=";"
+)
+```
+
+Encoding:
+
+```python
+df = pd.read_csv(
+    "data.csv",
+    encoding="cp1250"
+)
+```
+
+Kombinace:
+
+```python
+df = pd.read_csv(
+    "data.csv",
+    sep=";",
+    encoding="cp1250"
+)
+```
+
+```text
+sep=      → oddělovač sloupců
+encoding= → způsob uložení znaků
+
+UTF-8     → dnešní standard
+cp1250    → starší Windows encoding pro střední Evropu
+```
+
+UTF-8 většinou není nutné zadávat explicitně.
+
+TXT s tabulkovou strukturou lze načíst stejně:
+
+```python
+df = pd.read_csv(
+    "data.txt",
+    sep="\t"
+)
+```
+
+---
+
+## JSON
+
+```python
+df = pd.read_json("data.json")
+```
+
+```text
+{ } → objekt
+[ ] → pole / array
+
+"key": value
+→ dvojice klíč–hodnota
+```
+
+U jednoduchého JSON často:
+
+```text
+1 objekt → 1 záznam / řádek
+1 klíč   → 1 sloupec
+```
+
+### Nested JSON
+
+Pro zploštění vnořené struktury:
+
+```python
+df = pd.json_normalize(data)
+```
+
+Například:
+
+```text
+customer
+├── name
+└── city
+```
+
+se může změnit na:
+
+```text
+customer.name
+customer.city
+```
+
+`json_normalize()` = flattening / zploštění.
+
+---
+
+## Excel
+
+```python
+df = pd.read_excel("data.xlsx")
+```
+
+Může být potřeba:
 
 ```text
 pip install openpyxl
 ```
 
-```text
-NAČTENÍ                     ULOŽENÍ
+---
 
-pd.read_csv()       ←→      df.to_csv()
-pd.read_json()      ←→      df.to_json()
-pd.read_excel()     ←→      df.to_excel()
-pd.read_sql()       ←→      df.to_sql()
+## XML
+
+```python
+df = pd.read_xml("data.xml")
+```
+
+XML používá tagy:
+
+```xml
+<product>Laptop</product>
 ```
 
 ---
 
-# 3. DataFrame a Series
+## SQLite + SQL
+
+```python
+connection = sqlite3.connect(
+    "database.db"
+)
+```
+
+SQL dotaz:
+
+```python
+query = """
+SELECT *
+FROM orders
+WHERE quantity > 2
+"""
+```
+
+Načtení do DataFrame:
+
+```python
+df = pd.read_sql(
+    query,
+    connection
+)
+```
+
+Ukončení spojení:
+
+```python
+connection.close()
+```
+
+```text
+SQLite databáze
+→ connection
+→ SQL query
+→ pd.read_sql()
+→ DataFrame
+```
+
+Po načtení zůstává `df` v Pythonu i po `connection.close()`.
+
+---
+
+## API
+
+GET request:
+
+```python
+response = requests.get(url)
+```
+
+Kontrola:
+
+```python
+response.status_code
+```
+
+```text
+200 → OK
+```
+
+JSON odpověď:
+
+```python
+data = response.json()
+```
+
+Převod na DataFrame:
+
+```python
+df = pd.DataFrame(data)
+```
+
+U nested JSON:
+
+```python
+df = pd.json_normalize(data)
+```
+
+Workflow:
+
+```text
+API
+→ requests.get()
+→ response
+→ response.json()
+→ Python data
+→ DataFrame
+```
+
+---
+
+# 3. Raw data
+
+Původní data je vhodné zachovat:
+
+```python
+df_raw = pd.read_csv("data.csv")
+
+df = df_raw.copy()
+```
+
+```text
+df_raw → původní načtená data
+df     → pracovní kopie
+```
+
+Workflow:
+
+```text
+zdroj
+→ ingestion
+→ raw data
+→ cleaning
+→ validation
+→ analysis
+```
+
+---
+
+# 4. DataFrame a Series
 
 ```python
 type(df)
@@ -58,16 +295,9 @@ DataFrame → celá tabulka
 Series    → jeden sloupec
 ```
 
-`df` je pouze běžná konvence.
-
-```python
-orders = pd.read_csv("orders.csv")
-sales = pd.read_csv("sales.csv")
-```
-
 ---
 
-# 4. Základní kontrola datasetu
+# 5. Základní kontrola datasetu
 
 ```python
 df.head()
@@ -82,20 +312,20 @@ df.dtypes
 ```
 
 ```text
-df.shape
-→ (počet řádků, počet sloupců)
+shape   → (počet řádků, počet sloupců)
+columns → názvy sloupců
+dtypes  → datové typy
 ```
 
-Atributy nemají `()`:
+Atributy:
 
 ```python
 df.shape
 df.columns
-df.index
 df.dtypes
 ```
 
-Metody mají `()`:
+Metody:
 
 ```python
 df.head()
@@ -104,14 +334,14 @@ df.info()
 
 ---
 
-# 5. Datové typy
+# 6. Datové typy
 
 ```text
-str       → text
-int64     → celé číslo
-float64   → desetinné číslo
-bool      → True / False
-datetime  → datum a čas
+str      → text
+int64    → celé číslo
+float64  → desetinné číslo
+bool     → True / False
+datetime → datum a čas
 ```
 
 Kontrola:
@@ -120,7 +350,15 @@ Kontrola:
 df.dtypes
 ```
 
-Převod textu na datum:
+Převod:
+
+```python
+df["quantity"] = (
+    df["quantity"].astype(int)
+)
+```
+
+Datum:
 
 ```python
 df["order_date"] = pd.to_datetime(
@@ -130,17 +368,7 @@ df["order_date"] = pd.to_datetime(
 
 ---
 
-# 6. Pandas index
-
-Výchozí index:
-
-```text
-0
-1
-2
-3
-...
-```
+# 7. Pandas index
 
 ```text
 Pandas index
@@ -148,7 +376,7 @@ Pandas index
 business ID / primary key
 ```
 
-Reset indexu:
+Reset:
 
 ```python
 df = df.reset_index(
@@ -158,17 +386,15 @@ df = df.reset_index(
 
 ---
 
-# 7. Výběr sloupců
+# 8. Výběr sloupců
 
-Jeden sloupec:
+Jeden sloupec → `Series`:
 
 ```python
 df["product"]
 ```
 
-→ `Series`
-
-Více sloupců:
+Více sloupců → `DataFrame`:
 
 ```python
 df[
@@ -176,11 +402,9 @@ df[
 ]
 ```
 
-→ `DataFrame`
-
 ---
 
-# 8. Nový sloupec
+# 9. Nový sloupec
 
 ```python
 df["total"] = (
@@ -189,11 +413,9 @@ df["total"] = (
 )
 ```
 
-Pokud sloupec neexistuje, pandas ho vytvoří.
-
 ---
 
-# 9. Základní agregace
+# 10. Agregace
 
 ```python
 df["total"].sum()
@@ -205,34 +427,25 @@ df["product"].mode()
 ```
 
 ```text
-sum()       → součet
-mean()      → průměr
-min()       → minimum
-max()       → maximum
-median()    → medián
-mode()      → modus
+sum()    → součet
+mean()   → průměr
+min()    → minimum
+max()    → maximum
+median() → medián
+mode()   → modus
 ```
 
 ---
 
-# 10. Boolean maska a filtrování
-
-Samotná podmínka:
+# 11. Boolean maska a filtrování
 
 ```python
 df["total"] > 10000
 ```
 
-vrací:
+vrací `True / False`.
 
-```text
-True
-False
-True
-...
-```
-
-Použití:
+Filtr:
 
 ```python
 df[
@@ -248,20 +461,20 @@ mask = df["total"] > 10000
 high_value_orders = df[mask]
 ```
 
-Porovnávací operátory:
+Operátory:
 
 ```text
-==    rovná se
-!=    nerovná se
->     větší než
-<     menší než
->=    větší nebo rovno
-<=    menší nebo rovno
+==  rovná se
+!=  nerovná se
+>   větší než
+<   menší než
+>=  větší nebo rovno
+<=  menší nebo rovno
 ```
 
 ---
 
-# 11. Více podmínek
+# 12. Více podmínek
 
 ```text
 & → AND
@@ -270,7 +483,7 @@ Porovnávací operátory:
 ^ → XOR
 ```
 
-Každá podmínka má být v závorkách.
+Každá podmínka do závorky:
 
 ```python
 df[
@@ -279,24 +492,9 @@ df[
 ]
 ```
 
-```python
-df[
-    (df["total"] > 20000)
-    | (df["quantity"] >= 4)
-]
-```
-
-```python
-df[
-    ~(df["category"] == "Furniture")
-]
-```
-
 ---
 
-# 12. `isin()` a `between()`
-
-## `isin()`
+# 13. `isin()` a `between()`
 
 ```python
 df[
@@ -314,13 +512,12 @@ NOT IN:
 df[
     ~df["product"].isin([
         "Laptop",
-        "Desk",
-        "Monitor"
+        "Desk"
     ])
 ]
 ```
 
-## `between()`
+Interval:
 
 ```python
 df[
@@ -331,14 +528,6 @@ df[
 ]
 ```
 
-Výchozí:
-
-```text
-10000 <= x <= 20000
-```
-
-Možnosti:
-
 ```text
 inclusive="both"
 inclusive="left"
@@ -348,25 +537,20 @@ inclusive="neither"
 
 ---
 
-# 13. `loc` a `iloc`
+# 14. `loc` a `iloc`
 
 ## `loc`
 
-Výběr podle názvů a podmínek:
+Názvy a podmínky:
 
 ```python
 df.loc[
-    df["category"] == "Furniture",
-    ["product", "quantity", "total"]
+    df["total"] > 10000,
+    ["product", "total"]
 ]
 ```
 
-```text
-loc
-→ co se jmenuje jak
-```
-
-`loc` lze použít i ke změně vybraných hodnot:
+Změna hodnot:
 
 ```python
 df.loc[
@@ -377,7 +561,7 @@ df.loc[
 
 ## `iloc`
 
-Výběr podle číselné pozice:
+Číselné pozice:
 
 ```python
 df.iloc[
@@ -387,22 +571,13 @@ df.iloc[
 ```
 
 ```text
-iloc
-→ co je kde
-```
-
-Slicing:
-
-```text
-[start:stop]
-
 start → zahrnuje se
 stop  → nezahrnuje se
 ```
 
 ---
 
-# 14. Řazení
+# 15. Řazení
 
 ```python
 df.sort_values(
@@ -411,41 +586,20 @@ df.sort_values(
 )
 ```
 
-Například nejvyšší objednávky:
-
-```python
-df.sort_values(
-    by="total",
-    ascending=False
-).head()
-```
-
 ---
 
-# 15. Chybějící hodnoty
+# 16. Chybějící hodnoty
 
 ```text
-NaN
-→ hodnota chybí / není známá
-
-0
-→ skutečná známá hodnota nula
+NaN → hodnota chybí
+0   → známá hodnota nula
 ```
 
 Kontrola:
 
 ```python
-df.isna()
 df.isna().sum()
 df.notna()
-```
-
-Filtrování neprázdných hodnot:
-
-```python
-df[
-    df["region"].notna()
-]
 ```
 
 Odstranění:
@@ -478,37 +632,23 @@ df["unit_price"] = (
 )
 ```
 
-Není nutné každý `NaN` doplnit.
-
 ---
 
-# 16. `copy()` — pracovní kopie
+# 17. `copy()`
 
 ```python
-orders_clean = orders.copy()
+df_clean = df.copy()
 ```
 
-```text
-orders
-→ původní DataFrame
-
-orders_clean
-→ samostatná pracovní kopie
-```
-
-Při čištění dat je vhodné neměnit původní dataset bez důvodu.
+Vytvoří samostatnou pracovní kopii.
 
 ---
 
-# 17. Duplicity
-
-Počet duplicit:
+# 18. Duplicity
 
 ```python
 df.duplicated().sum()
 ```
-
-Zobrazení duplicit:
 
 ```python
 df[
@@ -516,25 +656,17 @@ df[
 ]
 ```
 
-Odstranění:
-
 ```python
 df = df.drop_duplicates()
 ```
 
-`drop_duplicates()` bez parametrů porovnává celý řádek.
-
 ---
 
-# 18. Kontrola kategorií
-
-Unikátní hodnoty:
+# 19. Kategorie
 
 ```python
 df["customer_type"].unique()
 ```
-
-Počet jednotlivých hodnot:
 
 ```python
 df["customer_type"].value_counts()
@@ -548,49 +680,29 @@ df["customer_type"].value_counts(
 )
 ```
 
-Praktické použití:
-
-```text
-B2B
-b2b
-B2B 
-Business
-```
-
-může odhalit nekonzistentní zápis kategorií.
-
 ---
 
-# 19. Čištění textových hodnot
-
-Odstranění mezer na začátku a konci:
+# 20. Čištění textu
 
 ```python
 df["product"] = (
-    df["product"]
-    .str.strip()
+    df["product"].str.strip()
 )
 ```
-
-Velká písmena:
 
 ```python
 df["customer_type"] = (
-    df["customer_type"]
-    .str.upper()
+    df["customer_type"].str.upper()
 )
 ```
-
-První písmena velká:
 
 ```python
 df["product"] = (
-    df["product"]
-    .str.title()
+    df["product"].str.title()
 )
 ```
 
-Nahrazení konkrétní hodnoty:
+Nahrazení:
 
 ```python
 df["region"] = (
@@ -604,21 +716,16 @@ df["region"] = (
 
 ---
 
-# 20. Kontrola nevalidních hodnot
-
-Příklady business pravidel:
+# 21. Validace hodnot
 
 ```python
-df[
-    df["quantity"] <= 0
+invalid_orders = df[
+    (df["quantity"] <= 0)
+    | (df["unit_price"] <= 0)
 ]
 ```
 
-```python
-df[
-    df["unit_price"] <= 0
-]
-```
+Další příklad:
 
 ```python
 df[
@@ -627,18 +734,7 @@ df[
 ]
 ```
 
-Více pravidel najednou:
-
-```python
-invalid_orders = df[
-    (df["quantity"] <= 0)
-    | (df["unit_price"] <= 0)
-    | (df["discount_pct"] < 0)
-    | (df["discount_pct"] > 1)
-]
-```
-
-Pokud správnou hodnotu neznáme, můžeme chybnou hodnotu převést na `NaN`:
+Neznámou chybnou hodnotu lze změnit na `NaN`:
 
 ```python
 df.loc[
@@ -647,32 +743,13 @@ df.loc[
 ] = pd.NA
 ```
 
-```python
-df.loc[
-    df["unit_price"] <= 0,
-    "unit_price"
-] = pd.NA
-```
-
-```python
-df.loc[
-    (df["discount_pct"] < 0)
-    | (df["discount_pct"] > 1),
-    "discount_pct"
-] = pd.NA
-```
-
 ---
 
-# 21. Outliers a `describe()`
-
-Rychlý statistický přehled:
+# 22. `describe()` a outliers
 
 ```python
 df["quantity"].describe()
 ```
-
-Ukazuje:
 
 ```text
 count
@@ -685,12 +762,6 @@ min
 max
 ```
 
-```text
-std
-→ směrodatná odchylka
-→ ukazuje rozptýlení hodnot
-```
-
 Kontrola extrémů:
 
 ```python
@@ -700,45 +771,24 @@ df.sort_values(
 ).head()
 ```
 
-Například:
-
-```python
-high_quantity_orders = df[
-    df["quantity"] > 20
-]
-```
-
-Důležitý princip:
-
 ```text
 neobvyklá hodnota
 ≠
 automaticky chyba
 ```
 
-Například `quantity = 50` může být legitimní velká B2B objednávka.
-
 ---
 
-# 22. Validace po čištění
-
-Po cleaningu data znovu zkontrolujeme:
+# 23. Validace po čištění
 
 ```python
 df.shape
-
 df.isna().sum()
-
 df.duplicated().sum()
-
-df["customer_type"].value_counts(
-    dropna=False
-)
+df.dtypes
 
 df["quantity"].min()
 df["quantity"].max()
-
-df.dtypes
 ```
 
 Kontrola business pravidel:
@@ -747,41 +797,33 @@ Kontrola business pravidel:
 df[
     (df["quantity"] <= 0)
     | (df["unit_price"] <= 0)
-    | (df["discount_pct"] < 0)
-    | (df["discount_pct"] > 1)
 ]
 ```
 
-Pokud je výsledek:
-
-```text
-Empty DataFrame
-```
-
-žádný řádek už daná validační pravidla neporušuje.
+`Empty DataFrame` znamená, že žádný řádek daná pravidla neporušuje.
 
 ---
 
-# 23. Data Cleaning Workflow
+# 24. Data Cleaning Workflow
 
 ```text
-načtení dat
-→ základní kontrola
-→ kontrola NaN
-→ kontrola duplicit
-→ kontrola kategorií
-→ sjednocení textu
-→ kontrola nevalidních hodnot
-→ kontrola outliers
-→ úprava datových typů
-→ validace po čištění
+raw data
+→ kontrola struktury
+→ NaN
+→ duplicity
+→ kategorie
+→ text
+→ validace
+→ outliers
+→ datové typy
+→ závěrečná kontrola
 ```
 
-Důležitý princip:
+Princip:
 
 ```text
 znám správnou hodnotu
-→ opravím ji
+→ opravím
 
 správnou hodnotu neznám
 → NaN / Unknown podle významu
@@ -789,12 +831,12 @@ správnou hodnotu neznám
 neobvyklá hodnota
 → nejdříve ověřím
 
-nevymýšlím data bez business důvodu
+data si nevymýšlím
 ```
 
 ---
 
-# 24. Export dat
+# 25. Export
 
 CSV:
 
@@ -835,166 +877,20 @@ df.to_sql(
 
 ---
 
-# 25. Rychlý pandas tahák
-
-```python
-import pandas as pd
-
-# načtení
-df = pd.read_csv("data.csv")
-
-# základní kontrola
-df.head()
-df.info()
-df.shape
-df.columns
-df.dtypes
-
-# pracovní kopie
-df_clean = df.copy()
-
-# NaN
-df_clean.isna().sum()
-df_clean["region"].fillna("Unknown")
-df_clean.dropna(subset=["product"])
-
-# duplicity
-df_clean.duplicated().sum()
-df_clean.drop_duplicates()
-
-# kategorie
-df_clean["region"].unique()
-df_clean["region"].value_counts(dropna=False)
-
-# text
-df_clean["product"].str.strip()
-df_clean["product"].str.title()
-df_clean["customer_type"].str.upper()
-
-# nahrazení
-df_clean["region"].replace(
-    "cz-west",
-    "CZ-West"
-)
-
-# datum
-df_clean["order_date"] = pd.to_datetime(
-    df_clean["order_date"]
-)
-
-# kontrola čísel
-df_clean[
-    df_clean["quantity"] <= 0
-]
-
-# změna nevalidní hodnoty na NaN
-df_clean.loc[
-    df_clean["quantity"] <= 0,
-    "quantity"
-] = pd.NA
-
-# statistický přehled
-df_clean["quantity"].describe()
-
-# nový sloupec
-df_clean["total"] = (
-    df_clean["quantity"]
-    * df_clean["unit_price"]
-)
-
-# agregace
-df_clean["total"].sum()
-df_clean["total"].mean()
-df_clean["total"].median()
-df_clean["total"].min()
-df_clean["total"].max()
-
-# filtr
-df_clean[
-    df_clean["total"] > 10000
-]
-
-# více podmínek
-df_clean[
-    (df_clean["total"] > 10000)
-    & (df_clean["category"] == "Furniture")
-]
-
-# isin
-df_clean[
-    df_clean["product"].isin([
-        "Laptop",
-        "Desk"
-    ])
-]
-
-# between
-df_clean[
-    df_clean["total"].between(
-        10000,
-        20000
-    )
-]
-
-# loc
-df_clean.loc[
-    df_clean["total"] > 10000,
-    ["product", "total"]
-]
-
-# iloc
-df_clean.iloc[
-    0:5,
-    1:4
-]
-
-# řazení
-df_clean.sort_values(
-    by="total",
-    ascending=False
-)
-
-# export
-df_clean.to_csv(
-    "clean_data.csv",
-    index=False
-)
-```
-
----
-
-# 26. Syntax — rychlá pomůcka
+# 26. Import ↔ Export
 
 ```text
-()
-→ funkce / metoda
-→ seskupení podmínek
+NAČTENÍ                     ULOŽENÍ
 
-[]
-→ sloupec
-→ filtrování
-→ list
-→ loc / iloc
-
-""
-→ text
-→ názvy sloupců
-→ textové hodnoty
-```
-
-Příklad:
-
-```python
-df["product"].isin([
-    "Laptop",
-    "Desk",
-    "Monitor"
-])
+pd.read_csv()       ←→      df.to_csv()
+pd.read_json()      ←→      df.to_json()
+pd.read_excel()     ←→      df.to_excel()
+pd.read_sql()       ←→      df.to_sql()
 ```
 
 ---
 
-# 27. SQL vs. pandas
+# 27. SQL vs. Pandas
 
 ```text
 SQL                         pandas
@@ -1019,11 +915,53 @@ IS NOT NULL                 notna()
 
 ---
 
-# 28. Nejdůležitější principy
+# 28. Syntax — rychlá pomůcka
+
+```text
+()
+→ funkce / metoda
+→ seskupení podmínek
+
+[]
+→ sloupec
+→ filtr
+→ list
+→ loc / iloc
+
+{}
+→ dictionary / JSON objekt
+
+""
+→ text
+
+.
+→ přístup k metodě / funkci / atributu
+
+_
+→ oddělení slov v názvu
+→ snake_case
+```
+
+Například:
+
+```python
+pd.read_json()
+```
+
+```text
+pd            → pandas
+.             → přístup
+read_json     → název funkce
+()            → spuštění funkce
+```
+
+---
+
+# 29. Nejdůležitější principy
 
 ```text
 DataFrame
-→ celá tabulka
+→ tabulka
 
 Series
 → jeden sloupec
@@ -1047,51 +985,49 @@ iloc
 → číselné pozice
 
 NaN
-→ chybějící nebo neznámá hodnota
+→ chybějící hodnota
 
-isna().sum()
-→ počet chybějících hodnot
+copy()
+→ pracovní kopie
 
 duplicated()
-→ kontrola duplicit
+→ duplicity
 
 unique()
 → unikátní hodnoty
 
 value_counts()
-→ četnost hodnot
-
-str.strip()
-→ odstranění mezer
-
-replace()
-→ nahrazení hodnot
+→ četnosti
 
 describe()
-→ rychlý statistický přehled
-
-pd.to_datetime()
-→ převod na datum
-
-copy()
-→ samostatná pracovní kopie
+→ statistický přehled
 ```
 
 ---
 
-# Typický analytický postup
+# 30. Typický analytický workflow
 
 ```text
-získání dat
-→ načtení
-→ kontrola struktury
-→ kontrola kvality
+zdroj dat
+→ ingestion
+→ raw data
+→ kontrola
 → cleaning
-→ validace
+→ validation
 → transformace
-→ filtrování
-→ výpočty a analýza
-→ export
+→ analýza
+→ export / reporting
+```
+
+Zdrojem může být například:
+
+```text
+CSV
+JSON
+Excel
+XML
+SQLite / SQL
+API
 ```
 
 ---
@@ -1099,14 +1035,9 @@ získání dat
 # Další témata
 
 ```text
-Data Sources & Ingestion
-SQLite
-pd.read_sql()
-API
-
 groupby()
 agg()
-GROUP BY / HAVING
+SQL GROUP BY / HAVING
 
 merge()
 SQL JOIN
