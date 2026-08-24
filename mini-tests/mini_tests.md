@@ -903,21 +903,279 @@ df = df_raw.copy()
 
 ---
 
-# Rychlý přehled Lekcí 6–10
+# Lekce 11 — `groupby()`, `agg()` a SQL logika
+
+## Test 1 — Základní `groupby()`
+
+### Zadání
+
+Máš `df` se sloupci:
 
 ```text
-Lekce 6
-→ Pandas základy, agregace, filtrování, řazení, export
-
-Lekce 7
-→ &, |, ~, isin(), between(), loc, iloc
-
-Lekce 8
-→ missing values, dropna(), fillna(), copy()
-
-Lekce 9
-→ cleaning, duplicity, validace, cleaning workflow
-
-Lekce 10
-→ CSV, JSON, nested JSON, SQLite, SQL, API, raw data
+category
+total
 ```
+
+Proveď:
+
+1. seskupení podle `category`,
+2. součet `total`,
+3. `reset_index()`,
+4. výsledek ulož do `sales_by_category`.
+
+### Řešení
+
+```python
+sales_by_category = (
+    df.groupby("category")["total"]
+    .sum()
+    .reset_index()
+)
+```
+
+### Krátce
+
+```text
+groupby("category")
+→ podle čeho seskupuji
+
+["total"]
+→ co agreguji
+
+.sum()
+→ jakou agregaci použiji
+```
+
+---
+
+## Test 2 — Více agregací přes `agg()`
+
+### Zadání
+
+Podle `category` spočítej nad `total`:
+
+* `sum`,
+* `mean`,
+* `max`.
+
+Výsledek ulož do `category_summary`.
+
+### Řešení
+
+```python
+category_summary = (
+    df.groupby("category")["total"]
+    .agg(["sum", "mean", "max"])
+    .reset_index()
+)
+```
+
+### Krátce
+
+```python
+.agg(["sum", "mean", "max"])
+```
+
+umožní provést více agregací najednou.
+
+---
+
+## Test 3 — Pojmenované agregace
+
+### Zadání
+
+Máš sloupce:
+
+```text
+category
+total
+quantity
+```
+
+Podle `category` vytvoř:
+
+* `total_revenue` = součet `total`,
+* `avg_order_value` = průměr `total`,
+* `max_quantity` = maximum `quantity`.
+
+### Řešení
+
+```python
+category_summary = (
+    df.groupby("category")
+    .agg(
+        total_revenue=("total", "sum"),
+        avg_order_value=("total", "mean"),
+        max_quantity=("quantity", "max")
+    )
+    .reset_index()
+)
+```
+
+### Krátce
+
+Obecný vzorec:
+
+```python
+novy_nazev=("zdrojovy_sloupec", "agregace")
+```
+
+---
+
+## Test 4 — WHERE vs. HAVING logika
+
+### Zadání
+
+Máš sloupce:
+
+```text
+category
+quantity
+total
+```
+
+Proveď:
+
+1. ponech řádky s `quantity >= 2`,
+2. seskup podle `category`,
+3. spočítej součet `total`,
+4. použij `reset_index()`,
+5. ponech pouze kategorie s `total > 30000`.
+
+Výsledek ulož do `high_value_categories`.
+
+### Řešení
+
+```python
+filtered = df[
+    df["quantity"] >= 2
+]
+
+grouped = (
+    filtered.groupby("category")["total"]
+    .sum()
+    .reset_index()
+)
+
+high_value_categories = grouped[
+    grouped["total"] > 30000
+]
+```
+
+### Krátce
+
+```text
+filtr před groupby()
+→ SQL WHERE
+
+filtr po agregaci
+→ SQL HAVING
+```
+
+Workflow:
+
+```text
+WHERE
+→ GROUP BY
+→ agregace
+→ HAVING
+```
+
+---
+
+## Test 5 — `groupby()` podle více sloupců
+
+### Zadání
+
+Máš sloupce:
+
+```text
+category
+region
+total
+```
+
+Proveď:
+
+1. seskupení podle `category` a `region`,
+2. součet `total`,
+3. `reset_index()`,
+4. výsledek ulož do `summary`.
+
+### Řešení
+
+```python
+summary = (
+    df.groupby(["category", "region"])["total"]
+    .sum()
+    .reset_index()
+)
+```
+
+### Krátce
+
+```python
+df.groupby(["category", "region"])
+```
+
+znamená seskupení podle kombinace více sloupců.
+
+---
+
+# SQL vs. Pandas — rychlý přehled
+
+```text
+SQL                         pandas
+
+GROUP BY category           groupby("category")
+
+SUM(total)                  ["total"].sum()
+
+AVG(total)                  ["total"].mean()
+
+MAX(total)                  ["total"].max()
+
+GROUP BY category, region   groupby(["category", "region"])
+
+WHERE                       filtr před groupby()
+
+HAVING                      filtr po agregaci
+```
+
+---
+
+# Základní syntaxe
+
+```python
+df.groupby("A")["B"].sum()
+```
+
+```text
+A → podle čeho seskupuji
+B → co agreguji
+sum → agregace
+```
+
+Více agregací:
+
+```python
+df.groupby("A")["B"].agg(
+    ["sum", "mean", "max"]
+)
+```
+
+Více skupin:
+
+```python
+df.groupby(["A", "B"])["C"].sum()
+```
+
+Pojmenované agregace:
+
+```python
+df.groupby("A").agg(
+    metric_name=("B", "sum")
+)
+```
+---
+
