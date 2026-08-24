@@ -1,23 +1,15 @@
-# Lekce 6
+# Lekce 6 — Pandas základy
 
 ## Test 1 — Načtení a kontrola dat
 
 ### Zadání
 
-Načti soubor:
+Načti `ecommerce_sales_analysis.csv` do `df` a zobraz:
 
-```text
-ecommerce_sales_analysis.csv
-```
-
-Proveď následující:
-
-1. importuj knihovnu `pandas`
-2. načti CSV soubor do proměnné `df`
-3. zobraz prvních 5 řádků
-4. zobraz počet řádků a sloupců
-5. zobraz názvy všech sloupců
-6. zobraz základní informace o datasetu
+* prvních 5 řádků,
+* rozměry datasetu,
+* názvy sloupců,
+* základní informace.
 
 ### Řešení
 
@@ -29,51 +21,15 @@ df = pd.read_csv("ecommerce_sales_analysis.csv")
 print(df.head())
 print(df.shape)
 print(df.columns)
-
 df.info()
 ```
 
-### Vysvětlení
+### Krátce
 
-```python
-df.head()
-```
-
-zobrazí prvních 5 řádků datasetu.
-
-```python
-df.shape
-```
-
-vrací dvojici:
-
-```text
-(počet řádků, počet sloupců)
-```
-
-```python
-df.columns
-```
-
-vrací názvy sloupců.
-
-```python
-df.info()
-```
-
-zobrazí informace o struktuře datasetu, počtu neprázdných hodnot a datových typech.
-
-`shape` a `columns` jsou atributy, proto se za nimi nepoužívají závorky.
-
-`info()` je metoda, proto se používají závorky.
-
-Není potřeba psát:
-
-```python
-print(df.info())
-```
-
-protože `df.info()` svůj výstup zobrazí sama.
+* `head()` → první řádky
+* `shape` → počet řádků a sloupců
+* `columns` → názvy sloupců
+* `info()` → struktura a datové typy
 
 ---
 
@@ -81,26 +37,12 @@ protože `df.info()` svůj výstup zobrazí sama.
 
 ### Zadání
 
-Vytvoř nový sloupec:
+Vytvoř `total = quantity × unit_price` a vypočítej:
 
-```text
-total
-```
-
-jako:
-
-```text
-quantity × unit_price
-```
-
-Potom vypočítej:
-
-1. celkové tržby
-2. průměrnou hodnotu objednávky
-3. nejvyšší hodnotu objednávky
-4. nejnižší hodnotu objednávky
-
-Výsledky ulož do proměnných a vypiš.
+* celkové tržby,
+* průměrnou hodnotu objednávky,
+* maximum,
+* minimum.
 
 ### Řešení
 
@@ -112,39 +54,20 @@ avg_order = df["total"].mean()
 max_order_value = df["total"].max()
 min_order_value = df["total"].min()
 
-print("Celkové tržby:", total_revenue, "Kč")
-print("Průměrná objednávka:", avg_order, "Kč")
-print("Nejnižší objednávka:", min_order_value, "Kč")
-print("Nejvyšší objednávka:", max_order_value, "Kč")
+print("Celkové tržby:", total_revenue)
+print("Průměrná objednávka:", avg_order)
+print("Maximum:", max_order_value)
+print("Minimum:", min_order_value)
 ```
 
-### Vysvětlení
-
-```python
-df["total"] = df["quantity"] * df["unit_price"]
-```
-
-provede výpočet po jednotlivých řádcích bez použití `for` cyklu.
-
-Použité agregace:
-
-```python
-.sum()
-.mean()
-.max()
-.min()
-```
-
-znamenají:
+### Krátce
 
 ```text
-sum()   → součet
-mean()  → průměr
-max()   → maximum
-min()   → minimum
+sum()  → součet
+mean() → průměr
+max()  → maximum
+min()  → minimum
 ```
-
-Název `max_order_value` je přesnější než například `max_revenue`, protože hledáme nejvyšší hodnotu jedné objednávky, nikoli celkové tržby.
 
 ---
 
@@ -152,12 +75,10 @@ Název `max_order_value` je přesnější než například `max_revenue`, proto�
 
 ### Zadání
 
-1. vypočítej průměrnou hodnotu objednávky
-2. vyfiltruj objednávky, jejichž `total` je vyšší než průměr
-3. výsledek ulož do `above_average_orders`
-4. vyfiltruj objednávky z kategorie `"Furniture"`
-5. výsledek ulož do `furniture_orders`
-6. vypočítej celkové tržby pouze pro kategorii `Furniture`
+* vypočítej průměr `total`,
+* vyber objednávky nad průměrem,
+* vyber kategorii `Furniture`,
+* spočítej její celkové tržby.
 
 ### Řešení
 
@@ -174,70 +95,30 @@ furniture_orders = df[
 
 total_revenue_furniture = furniture_orders["total"].sum()
 
-print(
-    "Celkové tržby nábytek:",
-    total_revenue_furniture,
-    "Kč"
-)
+print(total_revenue_furniture)
 ```
 
-### Vysvětlení
+### Krátce
 
-Samotná podmínka:
+Podmínka vytváří **boolean masku**:
 
 ```python
 df["total"] > average_order
 ```
 
-vrací hodnoty:
-
-```text
-True
-False
-True
-...
-```
-
-Jedná se o **boolean masku**.
-
-Použití:
+Použití masky:
 
 ```python
 df[df["total"] > average_order]
 ```
 
-znamená:
-
-```text
-vezmi DataFrame df
-→ otestuj podmínku
-→ ponech pouze řádky s hodnotou True
-```
-
-Stejný princip platí pro textový filtr:
-
-```python
-df[df["category"] == "Furniture"]
-```
-
-Potom můžeme nad filtrovaným DataFrame provádět další agregace:
-
-```python
-furniture_orders["total"].sum()
-```
-
 ---
 
-## Test 4 — Řazení a nejvyšší objednávka
+## Test 4 — Řazení
 
 ### Zadání
 
-1. seřaď celý dataset podle `total` sestupně
-2. výsledek ulož do `sorted_orders`
-3. zobraz prvních 5 řádků
-4. zjisti, která objednávka má nejvyšší hodnotu `total`
-
-Nepoužívej žádnou novou Pandas funkci.
+Seřaď dataset podle `total` sestupně a zobraz nejvyšší objednávku.
 
 ### Řešení
 
@@ -251,76 +132,21 @@ print(sorted_orders.head())
 print(sorted_orders.head(1))
 ```
 
-### Vysvětlení
+### Krátce
 
 ```python
 ascending=False
 ```
 
-znamená sestupné řazení:
-
-```text
-nejvyšší
-→ nejnižší
-```
-
-Po seřazení je proto nejvyšší objednávka na prvním místě.
-
-```python
-sorted_orders.head(1)
-```
-
-vrátí celý první řádek.
-
-Naopak:
-
-```python
-sorted_orders["total"].max()
-```
-
-vrátí pouze nejvyšší hodnotu `total`.
-
-Pandas po řazení zachovává původní indexy.
-
-Pokud chceme index vytvořit znovu:
-
-```python
-sorted_orders = sorted_orders.reset_index(drop=True)
-```
+= sestupné řazení.
 
 ---
 
-## Test 5 — Kompletní analytický workflow
+## Test 5 — Kompletní workflow
 
 ### Zadání
 
-Vytvoř jeden souvislý skript, který:
-
-1. načte `ecommerce_sales_analysis.csv`
-2. vytvoří sloupec `total`
-3. vypočítá průměrnou hodnotu objednávky
-4. vyfiltruje objednávky nad průměrem
-5. vyfiltrované objednávky seřadí podle `total` sestupně
-6. uloží výsledek do CSV:
-
-```text
-above_average_orders_test.csv
-```
-
-bez pandas indexu
-
-7. uloží stejný výsledek do JSON:
-
-```text
-above_average_orders_test.json
-```
-
-s nastavením:
-
-```python
-orient="records"
-indent=4
-```
+Načti CSV, vytvoř `total`, vyber objednávky nad průměrem, seřaď je a exportuj do CSV a JSON.
 
 ### Řešení
 
@@ -354,48 +180,29 @@ sorted_orders.to_json(
 )
 ```
 
-### Vysvětlení
-
-Správné pořadí operací je:
+### Krátce
 
 ```text
 načtení
 → výpočet
 → agregace
-→ filtrování
+→ filtr
 → řazení
 → export
 ```
 
-Důležitý je tento krok:
-
-```python
-sorted_orders = above_average_orders.sort_values(
-    by="total",
-    ascending=False
-)
-```
-
-Řadíme pouze objednávky, které už prošly filtrem.
-
 ---
 
-# Lekce 7
+# Lekce 7 — Filtrování, loc a iloc
 
-## Test 1 — Filtrování pomocí AND
+## Test 1 — AND
 
 ### Zadání
 
-Vyber objednávky, které současně splňují:
+Vyber objednávky:
 
-- `category == "Furniture"`
-- `total > 15000`
-
-Výsledek ulož do:
-
-```python
-furniture_high_value
-```
+* `category == "Furniture"`
+* `total > 15000`
 
 ### Řešení
 
@@ -406,9 +213,7 @@ furniture_high_value = df[
 ]
 ```
 
-### Vysvětlení
-
-V pandas používáme při kombinaci boolean podmínek:
+### Krátce
 
 ```text
 & → AND
@@ -417,7 +222,7 @@ V pandas používáme při kombinaci boolean podmínek:
 ^ → XOR
 ```
 
-Každá podmínka má být uzavřena ve vlastních závorkách.
+Každou podmínku uzavři do závorek.
 
 ---
 
@@ -425,30 +230,10 @@ Každá podmínka má být uzavřena ve vlastních závorkách.
 
 ### Zadání
 
-Vytvoř dva filtry.
+Vyber:
 
-První vybere objednávky, kde platí alespoň jedna podmínka:
-
-- `quantity >= 4`
-- `total > 20000`
-
-Výsledek:
-
-```python
-high_quantity_or_value
-```
-
-Druhý vybere objednávky, které nejsou z kategorie:
-
-```text
-Electronics
-```
-
-Výsledek:
-
-```python
-not_electronics
-```
+1. `quantity >= 4` nebo `total > 20000`
+2. vše mimo kategorii `Electronics`
 
 ### Řešení
 
@@ -458,21 +243,6 @@ high_quantity_or_value = df[
     | (df["total"] > 20000)
 ]
 
-not_electronics = df[
-    ~(df["category"] == "Electronics")
-]
-```
-
-### Vysvětlení
-
-```text
-| → OR
-~ → NOT
-```
-
-Jednodušší varianta druhého filtru:
-
-```python
 not_electronics = df[
     df["category"] != "Electronics"
 ]
@@ -484,31 +254,7 @@ not_electronics = df[
 
 ### Zadání
 
-Vyber produkty:
-
-```text
-Laptop
-Desk
-Office Chair
-```
-
-Výsledek ulož do:
-
-```python
-selected_products
-```
-
-Potom z nich vyber objednávky, kde je `total` mezi:
-
-```text
-15000 až 30000 včetně
-```
-
-Výsledek:
-
-```python
-selected_mid_value
-```
+Vyber produkty `Laptop`, `Desk`, `Office Chair` a poté pouze objednávky s `total` mezi 15000 a 30000 včetně.
 
 ### Řešení
 
@@ -529,46 +275,23 @@ selected_mid_value = selected_products[
 ]
 ```
 
-### Vysvětlení
+### Krátce
 
-```python
-isin()
-```
-
-ověřuje, zda je hodnota v zadaném seznamu.
-
-```python
-between(15000, 30000)
-```
-
-znamená:
-
-```text
-15000 <= total <= 30000
-```
-
-Druhou masku vytváříme nad `selected_products`, protože právě tento DataFrame dále filtrujeme.
+* `isin()` → hodnota patří do seznamu
+* `between()` → hodnota leží v intervalu
 
 ---
 
-## Test 4 — Výběr pomocí `loc`
+## Test 4 — `loc`
 
 ### Zadání
 
-Pomocí `loc` vyber:
+Pomocí `loc` vyber řádky s `total > 10000` a sloupce:
 
-- řádky, kde `total > 10000`
-- sloupce:
-  - `order_id`
-  - `product`
-  - `category`
-  - `total`
-
-Výsledek:
-
-```python
-high_value_summary
-```
+* `order_id`
+* `product`
+* `category`
+* `total`
 
 ### Řešení
 
@@ -579,17 +302,10 @@ high_value_summary = df.loc[
 ]
 ```
 
-### Vysvětlení
-
-Základ:
+### Krátce
 
 ```python
 df.loc[řádky, sloupce]
-```
-
-```text
-řádky   → podobné SQL WHERE
-sloupce → podobné SQL SELECT
 ```
 
 ---
@@ -598,31 +314,9 @@ sloupce → podobné SQL SELECT
 
 ### Zadání
 
-Pomocí `iloc` vyber:
+Pomocí `iloc` vyber prvních 5 řádků a sloupce na pozicích 1–4.
 
-- prvních 5 řádků
-- sloupce na pozicích `1`, `2`, `3`, `4`
-
-Výsledek:
-
-```python
-first_five_selected
-```
-
-Potom pomocí `loc` vyber z původního DataFrame:
-
-- `category == "Furniture"`
-- `total > 10000`
-- sloupce:
-  - `product`
-  - `quantity`
-  - `total`
-
-Výsledek:
-
-```python
-furniture_summary
-```
+Potom pomocí `loc` vyber `Furniture` s `total > 10000`.
 
 ### Řešení
 
@@ -639,137 +333,45 @@ furniture_summary = df.loc[
 ]
 ```
 
-### Vysvětlení
-
-`iloc` pracuje s číselnými pozicemi:
-
-```python
-df.iloc[řádky, sloupce]
-```
-
-U slicingu:
+### Krátce
 
 ```text
-start → zahrnuje se
-stop  → nezahrnuje se
-```
-
-Proto:
-
-```python
-0:5
-```
-
-znamená:
-
-```text
-0, 1, 2, 3, 4
-```
-
-A:
-
-```python
-1:5
-```
-
-znamená:
-
-```text
-1, 2, 3, 4
-```
-
-Rozdíl:
-
-```text
-loc
-→ názvy a podmínky
-
-iloc
-→ číselné pozice
+loc  → názvy a podmínky
+iloc → číselné pozice
 ```
 
 ---
 
-# Lekce 8
+# Lekce 8 — Missing values
 
 ## Test 1 — Kontrola chybějících hodnot
 
 ### Zadání
 
-U DataFrame:
-
-```python
-orders
-```
-
-zjisti počet chybějících hodnot v každém sloupci a výsledek vypiš.
+Zjisti počet chybějících hodnot v každém sloupci `orders`.
 
 ### Řešení
 
 ```python
-print(
-    orders.isna().sum()
-)
+print(orders.isna().sum())
 ```
 
-### Vysvětlení
-
-```python
-orders.isna()
-```
-
-vrací:
+### Krátce
 
 ```text
-True  → hodnota chybí
-False → hodnota nechybí
+True  = chybí
+False = nechybí
 ```
 
-Následné:
-
-```python
-.sum()
-```
-
-spočítá počet hodnot `True` v jednotlivých sloupcích.
-
-```text
-True  = 1
-False = 0
-```
-
-Proto:
-
-```python
-orders.isna().sum()
-```
-
-vrací počet chybějících hodnot v každém sloupci.
+`sum()` spočítá hodnoty `True`.
 
 ---
 
-## Test 2 — Odstranění řádků podle konkrétního sloupce
+## Test 2 — `dropna()` a `subset`
 
 ### Zadání
 
-Vytvoř nový DataFrame:
-
-```python
-orders_clean
-```
-
-ve kterém odstraníš pouze řádky, kde chybí hodnota ve sloupci:
-
-```text
-product
-```
-
-Použij:
-
-```python
-dropna()
-subset
-```
+Odstraň pouze řádky, kde chybí `product`.
 
 ### Řešení
 
@@ -779,52 +381,17 @@ orders_clean = orders.dropna(
 )
 ```
 
-### Vysvětlení
+### Krátce
 
-Samotné:
-
-```python
-orders.dropna()
-```
-
-by odstranilo každý řádek obsahující alespoň jednu chybějící hodnotu.
-
-Pomocí:
-
-```python
-subset=["product"]
-```
-
-říkáme Pandas:
-
-```text
-při rozhodování o odstranění řádku
-kontroluj pouze sloupec product
-```
+`subset` určuje sloupce, podle kterých se rozhoduje o odstranění řádku.
 
 ---
 
-## Test 3 — Doplnění textové hodnoty
+## Test 3 — `fillna()` s textem
 
 ### Zadání
 
-1. vytvoř kopii `orders` do:
-
-```python
-orders_filled
-```
-
-2. ve sloupci:
-
-```text
-region
-```
-
-nahraď chybějící hodnoty textem:
-
-```text
-Unknown
-```
+Vytvoř kopii `orders` a chybějící `region` nahraď `"Unknown"`.
 
 ### Řešení
 
@@ -837,7 +404,7 @@ orders_filled["region"] = (
 )
 ```
 
-### Vysvětlení
+### Krátce
 
 ```python
 orders.copy()
@@ -845,82 +412,13 @@ orders.copy()
 
 vytvoří samostatnou kopii DataFrame.
 
-Rozdíl:
-
-```python
-orders_filled = orders
-```
-
-znamená:
-
-```text
-dvě proměnné
-→ jeden DataFrame
-```
-
-Naopak:
-
-```python
-orders_filled = orders.copy()
-```
-
-znamená:
-
-```text
-orders
-→ původní DataFrame
-
-orders_filled
-→ samostatná kopie
-```
-
-Tento zápis:
-
-```python
-orders_filled["region"]
-```
-
-vybere pouze sloupec `region`.
-
-```python
-.fillna("Unknown")
-```
-
-v něm nahradí chybějící hodnoty.
-
-Důležité je výsledek přiřadit zpět do stejného sloupce:
-
-```python
-orders_filled["region"] = ...
-```
-
-Ne:
-
-```python
-orders_filled = ...
-```
-
-protože tím bychom celý DataFrame přepsali výslednou `Series`.
-
 ---
 
-## Test 4 — Doplnění číselné hodnoty mediánem
+## Test 4 — `fillna()` mediánem
 
 ### Zadání
 
-1. vytvoř kopii `orders` do:
-
-```python
-orders_filled
-```
-
-2. ve sloupci:
-
-```text
-unit_price
-```
-
-nahraď chybějící hodnotu mediánem tohoto sloupce.
+Chybějící `unit_price` nahraď mediánem.
 
 ### Řešení
 
@@ -935,75 +433,18 @@ orders_filled["unit_price"] = (
 )
 ```
 
-### Alternativní řešení s mezikrokem
-
-```python
-orders_filled = orders.copy()
-
-median_price = (
-    orders_filled["unit_price"].median()
-)
-
-orders_filled["unit_price"] = (
-    orders_filled["unit_price"]
-    .fillna(median_price)
-)
-```
-
-### Vysvětlení
-
-Nejprve:
-
-```python
-orders_filled["unit_price"].median()
-```
-
-spočítá medián sloupce `unit_price`.
-
-Potom:
-
-```python
-fillna(...)
-```
-
-použije tuto hodnotu jako náhradu za `NaN`.
-
-Princip:
-
-```text
-vyber sloupec
-→ spočítej medián
-→ použij ho ve fillna()
-```
-
-Mezikrok:
-
-```python
-median_price = ...
-```
-
-není nutný, ale může zlepšit čitelnost a pomoci při pochopení logiky.
-
 ---
 
-## Test 5 — Kompletní cleaning workflow
+## Test 5 — Cleaning workflow
 
 ### Zadání
 
-Vytvoř nový DataFrame:
+V kopii `orders`:
 
-```python
-orders_clean
-```
-
-jako kopii `orders`.
-
-Potom:
-
-1. doplň chybějící `region` hodnotou `"Unknown"`
-2. doplň chybějící `unit_price` mediánem
-3. odstraň řádky, kde chybí `product`
-4. vypiš počet zbývajících chybějících hodnot v každém sloupci
+1. doplň `region` hodnotou `"Unknown"`,
+2. doplň `unit_price` mediánem,
+3. odstraň řádky bez `product`,
+4. zkontroluj missing values.
 
 ### Řešení
 
@@ -1026,61 +467,18 @@ orders_clean = orders_clean.dropna(
     subset=["product"]
 )
 
-print(
-    orders_clean.isna().sum()
-)
+print(orders_clean.isna().sum())
 ```
-
-### Vysvětlení
-
-Správné pořadí:
-
-```text
-původní data
-→ vytvoření kopie
-→ doplnění textové hodnoty
-→ doplnění číselné hodnoty
-→ odstranění nežádoucího řádku
-→ kontrola výsledku
-```
-
-Důležité je pokračovat nad stejným pracovním DataFrame:
-
-```python
-orders_clean
-```
-
-Správně:
-
-```python
-orders_clean = orders_clean.dropna(
-    subset=["product"]
-)
-```
-
-Ne:
-
-```python
-orders_clean = orders.dropna(
-    subset=["product"]
-)
-```
-
-Ve druhém případě bychom se vrátili k původním datům a přišli o předchozí změny provedené v `orders_clean`.
 
 ---
 
-# Lekce 9
+# Lekce 9 — Data Cleaning & Validation
 
 ## Test 1 — Chybějící hodnoty
 
 ### Zadání
 
-Máš DataFrame:
-
 ```python
-import pandas as pd
-
 data = {
     "order_id": [1001, 1002, 1003, 1004, 1005],
     "product": ["Laptop", "Monitor", None, "Desk", "Mouse"],
@@ -1091,16 +489,10 @@ data = {
 df = pd.DataFrame(data)
 ```
 
-Proveď následující:
-
-1. zjisti počet chybějících hodnot v každém sloupci
-2. odstraň řádky, kde chybí `product`
-3. chybějící hodnoty ve sloupci `quantity` nahraď hodnotou `1`
-4. výsledek ulož do:
-
-```python
-clean_df
-```
+* zjisti missing values,
+* odstraň řádky bez `product`,
+* doplň `quantity` hodnotou `1`,
+* výsledek ulož do `clean_df`.
 
 ### Řešení
 
@@ -1111,62 +503,16 @@ df = df.dropna(
     subset=["product"]
 )
 
-df["quantity"] = (
-    df["quantity"]
-    .fillna(1)
-)
+df["quantity"] = df["quantity"].fillna(1)
 
 clean_df = df
 ```
 
-### Vysvětlení
+### Krátce
 
-```python
-df.isna().sum()
-```
-
-zjistí počet chybějících hodnot v jednotlivých sloupcích.
-
-```python
-df.dropna(
-    subset=["product"]
-)
-```
-
-odstraní pouze řádky, kde chybí hodnota ve sloupci `product`.
-
-Parametr:
-
-```python
-subset=["product"]
-```
-
-říká Pandas, že při rozhodování o odstranění řádku má kontrolovat pouze tento sloupec.
-
-```python
-df["quantity"].fillna(1)
-```
-
-nahradí chybějící hodnoty ve sloupci `quantity` číslem `1`.
-
-Důležitý rozdíl:
-
-```python
-1
-```
-
-je číslo.
-
-```python
-"1"
-```
-
-je textový řetězec.
-
-Proto při práci s číselným sloupcem používáme:
-
-```python
-.fillna(1)
+```text
+1   → číslo
+"1" → text
 ```
 
 ---
@@ -1174,8 +520,6 @@ Proto při práci s číselným sloupcem používáme:
 ## Test 2 — Duplicity
 
 ### Zadání
-
-Máš DataFrame:
 
 ```python
 data = {
@@ -1187,96 +531,16 @@ data = {
 df = pd.DataFrame(data)
 ```
 
-Proveď následující:
-
-1. zjisti, které řádky jsou duplicitní
-2. zjisti počet duplicitních řádků
-3. odstraň duplicity
-4. výsledek ulož do:
-
-```python
-clean_df
-```
+Zjisti duplicity, jejich počet a odstraň je.
 
 ### Řešení
 
 ```python
-print(
-    df[df.duplicated()]
-)
-
-print(
-    df.duplicated().sum()
-)
+print(df[df.duplicated()])
+print(df.duplicated().sum())
 
 clean_df = df.drop_duplicates()
 ```
-
-### Vysvětlení
-
-```python
-df.duplicated()
-```
-
-vrací boolean masku:
-
-```text
-False
-False
-True
-False
-False
-True
-```
-
-Hodnota:
-
-```text
-True
-```
-
-znamená, že daný řádek je duplicitní vůči některému předchozímu řádku.
-
-Použití:
-
-```python
-df[df.duplicated()]
-```
-
-zobrazí pouze duplicitní řádky.
-
-```python
-df.duplicated().sum()
-```
-
-spočítá jejich počet.
-
-Platí:
-
-```text
-True  = 1
-False = 0
-```
-
-Duplicity odstraníme pomocí:
-
-```python
-df.drop_duplicates()
-```
-
-Důležité je výsledek uložit:
-
-```python
-clean_df = df.drop_duplicates()
-```
-
-Samotné:
-
-```python
-df.drop_duplicates()
-```
-
-vytvoří nový DataFrame, ale původní `df` automaticky nezmění.
 
 ---
 
@@ -1284,84 +548,26 @@ vytvoří nový DataFrame, ale původní `df` automaticky nezmění.
 
 ### Zadání
 
-Máš DataFrame:
-
-```python
-data = {
-    "order_id": ["1001", "1002", "1003"],
-    "quantity": ["2", "3", "1"],
-    "unit_price": ["25000.5", "7000", "12000"]
-}
-
-df = pd.DataFrame(data)
-```
-
-Všechny hodnoty jsou načtené jako text.
-
-Převeď:
-
-1. `order_id` na celé číslo
-2. `quantity` na celé číslo
-3. `unit_price` na desetinné číslo
-4. zobraz výsledné datové typy sloupců
+Převeď textové hodnoty na vhodné číselné typy.
 
 ### Řešení
 
 ```python
 df["order_id"] = df["order_id"].astype(int)
-
 df["quantity"] = df["quantity"].astype(int)
-
 df["unit_price"] = df["unit_price"].astype(float)
 
 print(df.dtypes)
 ```
 
-### Vysvětlení
+### Krátce
 
-Metoda:
-
-```python
-.astype()
+```text
+int   → celé číslo
+float → desetinné číslo
 ```
 
-slouží ke změně datového typu hodnot v Pandas objektu.
-
-Například:
-
-```python
-df["quantity"].astype(int)
-```
-
-převede celý sloupec `quantity` na celá čísla.
-
-```python
-int
-```
-
-znamená celé číslo.
-
-```python
-float
-```
-
-znamená desetinné číslo.
-
-Proto:
-
-```python
-df["unit_price"] = df["unit_price"].astype(float)
-```
-
-převede `unit_price` na desetinný číselný typ.
-
-Datové typy zobrazíme pomocí:
-
-```python
-df.dtypes
-```
-
-> Poznámka: `astype()` nebylo součástí původně procvičené látky Lekce 9. Tento test proto bereme jako doplňkový příklad převodu datových typů, nikoli jako požadovanou znalost z Lekce 9.
+> `astype()` zde bereme jako doplňkový příklad.
 
 ---
 
@@ -1369,39 +575,14 @@ df.dtypes
 
 ### Zadání
 
-Máš DataFrame:
-
-```python
-data = {
-    "order_id": [1001, 1002, 1003, 1004, 1005],
-    "product": ["Laptop", "Monitor", "Desk", "Mouse", "Keyboard"],
-    "quantity": [2, -1, 3, 0, 5],
-    "unit_price": [25000, 7000, -12000, 800, 1500]
-}
-
-df = pd.DataFrame(data)
-```
-
-Business pravidla říkají:
+Business pravidla:
 
 ```text
 quantity > 0
 unit_price > 0
 ```
 
-Vytvoř DataFrame:
-
-```python
-invalid_rows
-```
-
-který bude obsahovat všechny řádky, kde je:
-
-- `quantity` neplatné
-
-nebo
-
-- `unit_price` neplatné
+Vyber všechny neplatné řádky.
 
 ### Řešení
 
@@ -1412,80 +593,15 @@ invalid_rows = df[
 ]
 ```
 
-### Vysvětlení
+### Krátce
 
-Business pravidla definují platné hodnoty:
-
-```text
-quantity > 0
-unit_price > 0
-```
-
-Neplatné hodnoty jsou tedy jejich opak:
-
-```text
-quantity <= 0
-unit_price <= 0
-```
-
-Proto použijeme:
-
-```python
-df["quantity"] <= 0
-```
-
-a:
-
-```python
-df["unit_price"] <= 0
-```
-
-Chceme najít řádek, kde je neplatná alespoň jedna z těchto hodnot.
-
-Proto používáme:
-
-```python
-|
-```
-
-což v Pandas znamená:
-
-```text
-OR
-```
-
-Každá podmínka musí být uzavřena ve vlastních kulatých závorkách:
-
-```python
-(df["quantity"] <= 0)
-| (df["unit_price"] <= 0)
-```
-
-Obecný zápis:
-
-```python
-df[
-    (podmínka_1)
-    | (podmínka_2)
-]
-```
-
-Pro `AND` bychom použili:
-
-```python
-df[
-    (podmínka_1)
-    & (podmínka_2)
-]
-```
+Neplatný je řádek, kde selže alespoň jedno business pravidlo.
 
 ---
 
 ## Test 5 — Kompletní cleaning workflow
 
 ### Zadání
-
-Máš DataFrame:
 
 ```python
 data = {
@@ -1498,46 +614,20 @@ data = {
 df = pd.DataFrame(data)
 ```
 
-Vytvoř čistý dataset.
+Proveď:
 
-Postupně:
-
-1. zkontroluj chybějící hodnoty
-2. odstraň duplicity
-3. odstraň řádky, kde chybí `product`
-4. chybějící `quantity` nahraď hodnotou `1`
-5. ponech pouze řádky, kde platí:
-
-```python
-quantity > 0
-```
-
-6. vytvoř nový sloupec:
-
-```python
-total
-```
-
-jako:
-
-```text
-quantity × unit_price
-```
-
-7. výsledek ulož do:
-
-```python
-clean_df
-```
-
-8. nakonec zobraz výsledný DataFrame a jeho základní informace
+1. kontrolu missing values,
+2. odstranění duplicit,
+3. odstranění řádků bez `product`,
+4. doplnění `quantity = 1`,
+5. validaci `quantity > 0`,
+6. vytvoření `total`,
+7. uložení do `clean_df`.
 
 ### Řešení
 
 ```python
-print(
-    df.isna().sum()
-)
+print(df.isna().sum())
 
 df = df.drop_duplicates()
 
@@ -1545,10 +635,7 @@ df = df.dropna(
     subset=["product"]
 )
 
-df["quantity"] = (
-    df["quantity"]
-    .fillna(1)
-)
+df["quantity"] = df["quantity"].fillna(1)
 
 df = df[
     df["quantity"] > 0
@@ -1562,105 +649,10 @@ df["total"] = (
 clean_df = df
 
 print(clean_df)
-
 clean_df.info()
 ```
 
-### Vysvětlení
-
-Nejprve zkontrolujeme chybějící hodnoty:
-
-```python
-df.isna().sum()
-```
-
-Potom odstraníme duplicitní řádky:
-
-```python
-df = df.drop_duplicates()
-```
-
-Řádky bez produktu odstraníme pomocí:
-
-```python
-df = df.dropna(
-    subset=["product"]
-)
-```
-
-Chybějící množství doplníme číslem `1`:
-
-```python
-df["quantity"] = (
-    df["quantity"]
-    .fillna(1)
-)
-```
-
-Potom aplikujeme business validační pravidlo:
-
-```python
-df["quantity"] > 0
-```
-
-a ponecháme pouze platné řádky:
-
-```python
-df = df[
-    df["quantity"] > 0
-]
-```
-
-Nový sloupec:
-
-```python
-total
-```
-
-vytvoříme výpočtem po jednotlivých řádcích:
-
-```python
-df["total"] = (
-    df["quantity"]
-    * df["unit_price"]
-)
-```
-
-Nakonec pracovní DataFrame uložíme jako:
-
-```python
-clean_df = df
-```
-
-a provedeme závěrečnou kontrolu:
-
-```python
-print(clean_df)
-
-clean_df.info()
-```
-
-Celý workflow tedy odpovídá:
-
-```text
-raw data
-
-→ kontrola missing values
-
-→ odstranění duplicit
-
-→ řešení chybějících hodnot
-
-→ validace business pravidel
-
-→ odstranění neplatných řádků
-
-→ vytvoření odvozeného sloupce
-
-→ kontrola výsledku
-```
-
-Tento postup odpovídá běžnému principu:
+### Krátce
 
 ```text
 inspect
@@ -1670,14 +662,262 @@ inspect
 → verify
 ```
 
-tedy:
+---
+
+# Lekce 10 — Data Sources & Ingestion
+
+## Test 1 — CSV: separator a encoding
+
+### Zadání
+
+Načti `sales.csv`:
+
+* oddělovač `;`
+* encoding `cp1250`
+
+Potom zobraz `head()`, `shape`, `columns` a `info()`.
+
+### Řešení
+
+```python
+import pandas as pd
+
+df = pd.read_csv(
+    "sales.csv",
+    sep=";",
+    encoding="cp1250"
+)
+
+print(df.head())
+print(df.shape)
+print(df.columns)
+df.info()
+```
+
+### Krátce
 
 ```text
-zkontrolovat
-→ vyčistit
-→ validovat
-→ transformovat
-→ ověřit
+sep=       → oddělovač sloupců
+encoding=  → způsob uložení znaků
+```
+
+UTF-8 většinou není nutné zadávat explicitně.
+
+---
+
+## Test 2 — JSON
+
+### Zadání
+
+Načti `sales.json` do `df` a proveď základní kontrolu.
+
+### Řešení
+
+```python
+import pandas as pd
+
+df = pd.read_json("sales.json")
+
+print(df.head())
+print(df.shape)
+print(df.columns)
+df.info()
+```
+
+### Krátce
+
+```text
+{ } → objekt
+[ ] → pole / array
+```
+
+U jednoduchého JSON často:
+
+```text
+1 objekt → 1 řádek
+1 klíč   → 1 sloupec
 ```
 
 ---
+
+## Test 3 — Nested JSON
+
+### Zadání
+
+```python
+data = [
+    {
+        "order_id": 1001,
+        "product": "Laptop",
+        "customer": {
+            "name": "Jan Novák",
+            "city": "Plzeň"
+        }
+    },
+    {
+        "order_id": 1002,
+        "product": "Monitor",
+        "customer": {
+            "name": "Petra Malá",
+            "city": "Praha"
+        }
+    }
+]
+```
+
+Zplošti vnořený JSON do DataFrame.
+
+### Řešení
+
+```python
+import pandas as pd
+
+df = pd.json_normalize(data)
+```
+
+### Krátce
+
+Výsledné sloupce mohou být:
+
+```text
+customer.name
+customer.city
+```
+
+`json_normalize()` = flattening / zploštění JSON.
+
+---
+
+## Test 4 — SQLite + SQL
+
+### Zadání
+
+Z databáze:
+
+```text
+ecommerce_practice.db
+```
+
+načti z tabulky `orders` pouze řádky:
+
+```sql
+WHERE quantity > 2
+```
+
+### Řešení
+
+```python
+import pandas as pd
+import sqlite3
+
+connection = sqlite3.connect(
+    "ecommerce_practice.db"
+)
+
+query = """
+SELECT *
+FROM orders
+WHERE quantity > 2
+"""
+
+df = pd.read_sql(
+    query,
+    connection
+)
+
+connection.close()
+
+print(df.head())
+```
+
+### Krátce
+
+```text
+sqlite3.connect() → připojení k databázi
+pd.read_sql()     → SQL výsledek do DataFrame
+close()           → zavření spojení
+```
+
+Po načtení `df` zůstává v paměti i po uzavření connection.
+
+---
+
+## Test 5 — API + raw data
+
+### Zadání
+
+Použij:
+
+```text
+https://jsonplaceholder.typicode.com/posts
+```
+
+Proveď:
+
+1. GET request,
+2. kontrolu `status_code`,
+3. převod JSON odpovědi,
+4. vytvoření `df_raw`,
+5. vytvoření pracovní kopie `df`,
+6. zobrazení prvních 5 řádků.
+
+### Řešení
+
+```python
+import requests
+import pandas as pd
+
+url = "https://jsonplaceholder.typicode.com/posts"
+
+response = requests.get(url)
+
+print(response.status_code)
+
+data = response.json()
+
+df_raw = pd.DataFrame(data)
+
+df = df_raw.copy()
+
+print(df.head())
+```
+
+### Krátce
+
+```text
+API
+→ requests.get()
+→ response
+→ response.json()
+→ Python data
+→ DataFrame
+```
+
+```python
+df_raw = pd.DataFrame(data)
+df = df_raw.copy()
+```
+
+`df_raw` = původní načtená data
+`df` = pracovní kopie
+
+---
+
+# Rychlý přehled Lekcí 6–10
+
+```text
+Lekce 6
+→ Pandas základy, agregace, filtrování, řazení, export
+
+Lekce 7
+→ &, |, ~, isin(), between(), loc, iloc
+
+Lekce 8
+→ missing values, dropna(), fillna(), copy()
+
+Lekce 9
+→ cleaning, duplicity, validace, cleaning workflow
+
+Lekce 10
+→ CSV, JSON, nested JSON, SQLite, SQL, API, raw data
+```
