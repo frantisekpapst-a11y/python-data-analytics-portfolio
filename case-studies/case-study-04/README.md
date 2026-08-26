@@ -33,7 +33,7 @@ case-study-04/
 
 ## Soubory
 
-- `case_study_04.py` — kompletní Python workflow
+- `case_study_04.py` — kompletní Python kód
 - `orders_raw.csv` — původní objednávky
 - `customers_raw.csv` — původní zákazníci
 - `products_raw.csv` — původní produkty
