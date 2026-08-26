@@ -1,4 +1,4 @@
-# Case Study 04 — Multi-Table Sales & Customer Analysis
+# Case Study 04 — Multi-Table Sales & Customer Analysis 
 
 ## Přehled
 
