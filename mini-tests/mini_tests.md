@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 12
+# Rychlý přehled Lekcí 6 až 13
 
 ```text
 Lekce 6
@@ -23,6 +23,9 @@ Lekce 11
 
 Lekce 12
 → merge(), JOIN, validate, suffixes
+
+Lekce 13
+→ datetime, dt, strftime(), filtrování podle data
 ```
 
 ---
@@ -50,6 +53,7 @@ df = pd.read_csv("ecommerce_sales_analysis.csv")
 print(df.head())
 print(df.shape)
 print(df.columns)
+
 df.info()
 ```
 
@@ -417,6 +421,7 @@ df = pd.read_csv(
 print(df.head())
 print(df.shape)
 print(df.columns)
+
 df.info()
 ```
 
@@ -428,6 +433,7 @@ df.info()
 df = pd.read_json("sales.json")
 
 print(df.head())
+
 df.info()
 ```
 
@@ -698,5 +704,111 @@ final_df = orders_customers.merge(
     on="product_id",
     how="left",
     validate="many_to_one"
+)
+```
+
+---
+
+# Lekce 13 — Datum a čas
+
+## Test 1 — Převod na datetime a `year_month`
+
+### Zadání
+
+Převeď `order_date` z textu na `datetime` a vytvoř `year_month` ve formátu `2026_08`.
+
+### Řešení
+
+```python
+orders["order_date"] = pd.to_datetime(
+    orders["order_date"]
+)
+
+orders["year_month"] = (
+    orders["order_date"]
+    .dt.strftime("%Y_%m")
+)
+```
+
+---
+
+## Test 2 — Rozdíl mezi daty
+
+### Zadání
+
+Z `order_date` a `delivery_date` vytvoř počet dní dodání.
+
+### Řešení
+
+```python
+orders["delivery_days"] = (
+    orders["delivery_date"]
+    - orders["order_date"]
+).dt.days
+```
+
+---
+
+## Test 3 — Filtrování mezi daty
+
+### Zadání
+
+Vyber objednávky mezi `2026-08-05` a `2026-08-15` bez zahrnutí hranic.
+
+### Řešení
+
+```python
+filtered_orders = orders[
+    orders["order_date"].between(
+        "2026-08-05",
+        "2026-08-15",
+        inclusive="neither"
+    )
+]
+```
+
+---
+
+## Test 4 — Den v týdnu
+
+### Zadání
+
+Vytvoř `day_name` s českým názvem dne.
+
+### Řešení
+
+```python
+orders["day_name"] = (
+    orders["order_date"]
+    .dt.day_name(
+        locale="cs_CZ"
+    )
+)
+```
+
+---
+
+## Test 5 — Měsíční revenue
+
+### Zadání
+
+Vytvoř `year_month` a spočítej celkové `revenue` za každý měsíc.
+
+Použij DataFrame bez `reset_index()`.
+
+### Řešení
+
+```python
+orders["year_month"] = (
+    orders["order_date"]
+    .dt.strftime("%Y_%m")
+)
+
+monthly_sales = (
+    orders.groupby(
+        "year_month",
+        as_index=False
+    )["revenue"]
+    .sum()
 )
 ```
