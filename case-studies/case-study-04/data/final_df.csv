@@ -1,0 +1,15 @@
+order_id,customer_id,product_id,quantity,discount_pct,notes,customer_name,customer_type,region,product_name,category,unit_price,unit_cost
+5001,101,501,1.0,0.0,,Jan Novák,B2C,Praha,Laptop,Electronics,25000.0,19000.0
+5002,102,502,2.0,0.1,,Petra Malá,B2B,Brno,Monitor,Electronics,7000.0,4800.0
+5003,103,503,1.0,0.05,,Tomáš Dvořák,B2C,Plzeň,Desk,Furniture,12000.0,8500.0
+5004,101,504,3.0,0.0,,Jan Novák,B2C,Praha,Mouse,Accessories,800.0,350.0
+5005,104,501,1.0,0.15,,Eva Černá,B2B,Ostrava,Laptop,Electronics,25000.0,19000.0
+5006,105,505,2.0,0.0,,Martin Král,B2C,Praha,Office Chair,Furniture,9000.0,6200.0
+5007,106,502,1.0,0.05,,Lucie Veselá,B2B,Brno,Monitor,Electronics,7000.0,4800.0
+5008,107,503,2.0,0.0,,Pavel Horák,B2C,Plzeň,Desk,Furniture,12000.0,8500.0
+5009,108,504,1.0,0.2,,Anna Němcová,B2C,Unknown,Mouse,Accessories,800.0,350.0
+5010,109,505,4.0,0.0,,Karel Marek,B2B,Praha,Office Chair,Furniture,9000.0,6200.0
+5011,110,501,1.0,0.1,,Jana Procházková,B2C,Ostrava,Laptop,Electronics,25000.0,19000.0
+5012,111,502,2.0,0.0,,Marek Jelínek,B2B,Brno,Monitor,Electronics,7000.0,4800.0
+5013,999,503,1.0,0.0,Unknown customer,,,,Desk,Furniture,12000.0,8500.0
+5014,104,504,1.0,0.05,,Eva Černá,B2B,Ostrava,Mouse,Accessories,800.0,350.0

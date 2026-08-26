@@ -1,0 +1,15 @@
+order_id,customer_id,product_id,quantity,discount_pct,notes,customer_name,customer_type,region
+5001,101,501,1.0,0.0,,Jan Novák,B2C,Praha
+5002,102,502,2.0,0.1,,Petra Malá,B2B,Brno
+5003,103,503,1.0,0.05,,Tomáš Dvořák,B2C,Plzeň
+5004,101,504,3.0,0.0,,Jan Novák,B2C,Praha
+5005,104,501,1.0,0.15,,Eva Černá,B2B,Ostrava
+5006,105,505,2.0,0.0,,Martin Král,B2C,Praha
+5007,106,502,1.0,0.05,,Lucie Veselá,B2B,Brno
+5008,107,503,2.0,0.0,,Pavel Horák,B2C,Plzeň
+5009,108,504,1.0,0.2,,Anna Němcová,B2C,Unknown
+5010,109,505,4.0,0.0,,Karel Marek,B2B,Praha
+5011,110,501,1.0,0.1,,Jana Procházková,B2C,Ostrava
+5012,111,502,2.0,0.0,,Marek Jelínek,B2B,Brno
+5013,999,503,1.0,0.0,Unknown customer,,,
+5014,104,504,1.0,0.05,,Eva Černá,B2B,Ostrava
