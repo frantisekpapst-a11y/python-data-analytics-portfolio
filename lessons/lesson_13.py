@@ -63,7 +63,7 @@ monthly_sales = orders.groupby("year_month")["revenue"].sum().reset_index()
 
 print(monthly_sales)
 
-monthly_sales = orders.groupby("year_month")["revenue"].sum()
+monthly_sales = (orders.groupby("year_month", as_index=False)["revenue"].sum())
 
 print(monthly_sales)
 
