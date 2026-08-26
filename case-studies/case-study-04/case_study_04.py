@@ -101,7 +101,6 @@ print(customers["region"].unique())
 print(products["product_name"].unique())
 print(products["category"].unique())
 
-
 customers["customer_type"] = (customers["customer_type"].str.strip().str.upper())
 customers["region"] = (customers["region"].str.strip().str.title())
 products["product_name"] = (products["product_name"].str.strip().str.title())
