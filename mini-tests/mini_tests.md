@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 14
+# Rychlý přehled Lekcí 6 až 15
 
 ```text
 Lekce 6
@@ -29,6 +29,9 @@ Lekce 13
 
 Lekce 14
 → práce s textem, .str, strip(), title(), lower(), upper(), contains(), startswith(), endswith(), replace(), split(), len()
+
+Lekce 15
+→ EDA, describe(), value_counts(), groupby(), IQR, outliers, corr(), histogram
 ```
 
 ---
@@ -968,3 +971,262 @@ customers["email_length"] = (
 ```
 
 ---
+
+
+# Lekce 15 — EDA (Exploratory Data Analysis)
+
+## Test 1 — `describe()` a interpretace
+
+### Zadání
+
+Zobraz základní statistický přehled pro `revenue`.
+
+Potom vysvětli, co může naznačit výraznější rozdíl mezi průměrem a mediánem.
+
+### Řešení
+
+```python
+print(
+    sales["revenue"].describe()
+)
+```
+
+### Krátce
+
+```text
+mean výrazně > median
+→ může upozornit na right-skewed distribuci
+→ případně na vysoký outlier
+
+mean výrazně < median
+→ může upozornit na left-skewed distribuci
+```
+
+Rozdíl mezi průměrem a mediánem je varovný signál, ne automatický důkaz outlieru.
+
+---
+
+## Test 2 — Počet objednávek podle regionu
+
+### Zadání
+
+Zjisti počet objednávek v jednotlivých regionech.
+
+### Řešení
+
+```python
+orders_summary = (
+    sales.groupby(
+        "region",
+        as_index=False
+    )["order_id"]
+    .count()
+)
+```
+
+### Krátce
+
+```text
+count()
+→ počítá neprázdné hodnoty konkrétního sloupce
+
+size()
+→ počítá řádky ve skupině
+
+value_counts()
+→ počítá četnost hodnot ve vybraném sloupci
+```
+
+Pokud `order_id` obsahuje `NaN`, může `count()` dát jiný výsledek než počet řádků.
+
+Pro počet řádků ve skupině:
+
+```python
+orders_summary = (
+    sales.groupby(
+        "region",
+        as_index=False
+    )
+    .size()
+)
+```
+
+---
+
+## Test 3 — Agregace podle regionu
+
+### Zadání
+
+Pro každý `region` spočítej:
+
+- počet objednávek,
+- celkové `revenue`,
+- průměrné `revenue`.
+
+### Řešení
+
+```python
+region_summary = (
+    sales.groupby(
+        "region",
+        as_index=False
+    )
+    .agg(
+        orders_count=("order_id", "count"),
+        total_revenue=("revenue", "sum"),
+        avg_revenue=("revenue", "mean")
+    )
+)
+```
+
+### Krátce
+
+```text
+count
+→ počet neprázdných order_id
+
+sum
+→ celkové revenue
+
+mean
+→ průměrné revenue
+```
+
+---
+
+## Test 4 — IQR a outliers
+
+### Zadání
+
+Pro `revenue` spočítej:
+
+- `Q1`,
+- `Q3`,
+- `IQR`,
+- dolní hranici,
+- horní hranici,
+
+a vyber potenciální outliery.
+
+### Řešení
+
+```python
+q1 = sales["revenue"].quantile(0.25)
+q3 = sales["revenue"].quantile(0.75)
+
+iqr = q3 - q1
+
+lower_bound = q1 - 1.5 * iqr
+upper_bound = q3 + 1.5 * iqr
+
+outliers = sales[
+    (sales["revenue"] < lower_bound)
+    | (sales["revenue"] > upper_bound)
+]
+```
+
+### Krátce
+
+```text
+Q1
+→ 25. percentil
+
+Q3
+→ 75. percentil
+
+IQR
+→ Q3 - Q1
+
+mimo hranice
+→ potenciální outlier
+→ ne automaticky chyba
+```
+
+---
+
+## Test 5 — Korelace
+
+### Zadání
+
+Zjisti korelaci mezi:
+
+```text
+quantity
+revenue
+```
+
+Potom interpretuj hodnotu kolem `0.92`.
+
+### Řešení
+
+```python
+correlation = sales[
+    ["quantity", "revenue"]
+].corr()
+```
+
+### Krátce
+
+```text
+0.92
+→ velmi silná pozitivní lineární korelace
+→ proměnné mají tendenci růst společně
+```
+
+Důležité:
+
+```text
+korelace
+≠
+kauzalita
+
+silná korelace
+≠
+přímá úměra
+```
+
+Vhodná formulace:
+
+```text
+Mezi quantity a revenue existuje
+velmi silný pozitivní vztah.
+```
+
+---
+
+## Test 6 — Distribuce
+
+### Zadání
+
+Vytvoř histogram `revenue` s pěti intervaly a zobraz ho.
+
+Potom interpretuj situaci:
+
+```text
+většina hodnot vlevo
++
+dlouhý ocas doprava
+```
+
+### Řešení
+
+```python
+import matplotlib.pyplot as plt
+
+sales["revenue"].hist(
+    bins=5
+)
+
+plt.show()
+```
+
+### Krátce
+
+```text
+většina hodnot vlevo
++
+dlouhý ocas doprava
+
+→ right-skewed distribuce
+→ často mean > median
+```
