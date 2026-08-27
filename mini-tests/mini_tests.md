@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 13
+# Rychlý přehled Lekcí 6 až 14
 
 ```text
 Lekce 6
@@ -26,6 +26,9 @@ Lekce 12
 
 Lekce 13
 → datetime, dt, strftime(), filtrování podle data
+
+Lekce 14
+→ práce s textem, .str, strip(), title(), lower(), upper(), contains(), startswith(), endswith(), replace(), split(), len()
 ```
 
 ---
@@ -812,3 +815,156 @@ monthly_sales = (
     .sum()
 )
 ```
+
+---
+
+## Test 6 — Kombinovaný úkol
+
+### Zadání
+
+1. vytvoř `delivery_days`,
+2. vyber objednávky ze srpna 2026,
+3. seřaď je podle `delivery_days` sestupně,
+4. zobraz pouze:
+
+```text
+order_id
+order_date
+delivery_days
+revenue
+```
+
+### Řešení
+
+```python
+orders["delivery_days"] = (
+    orders["delivery_date"]
+    - orders["order_date"]
+).dt.days
+
+august_orders = orders[
+    orders["order_date"].between(
+        "2026-08-01",
+        "2026-08-31"
+    )
+]
+
+august_orders = august_orders.sort_values(
+    by="delivery_days",
+    ascending=False
+)
+
+result = august_orders[
+    [
+        "order_id",
+        "order_date",
+        "delivery_days",
+        "revenue"
+    ]
+]
+
+print(result)
+```
+
+---
+
+# Lekce 14 — Práce s textem v Pandas
+
+## Test 1 — `strip()` a `title()`
+
+### Zadání
+
+Ve sloupci `customer_name`:
+
+- odstraň mezery na začátku a konci,
+- uprav jména do formátu `Jan Novák`.
+
+### Řešení
+
+```python
+customers["customer_name"] = (
+    customers["customer_name"]
+    .str.strip()
+    .str.title()
+)
+```
+
+---
+
+## Test 2 — `lower()`
+
+### Zadání
+
+Převeď celý sloupec `email` na malá písmena.
+
+### Řešení
+
+```python
+customers["email"] = (
+    customers["email"]
+    .str.lower()
+)
+```
+
+---
+
+## Test 3 — `endswith()`
+
+### Zadání
+
+Vyber pouze zákazníky, jejichž email končí na `gmail.com`.
+
+### Řešení
+
+```python
+g_customers = customers[
+    customers["email"].str.endswith(
+        "gmail.com",
+        na=False
+    )
+]
+```
+
+---
+
+## Test 4 — `split()`
+
+### Zadání
+
+Rozděl `email` podle `@` do sloupců:
+
+```text
+email_name
+email_domain
+```
+
+### Řešení
+
+```python
+customers[["email_name", "email_domain"]] = (
+    customers["email"]
+    .str.split(
+        "@",
+        expand=True
+    )
+)
+```
+
+---
+
+## Test 5 — `len()`
+
+### Zadání
+
+Vytvoř sloupec `email_length` s počtem znaků v emailu.
+
+### Řešení
+
+```python
+customers["email_length"] = (
+    customers["email"]
+    .str.len()
+)
+```
+
+---
