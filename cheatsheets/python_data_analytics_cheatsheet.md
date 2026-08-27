@@ -187,7 +187,7 @@ response.status_code
 200 → OK
 ```
 
-JSON odpověď:
+JSON:
 
 ```python
 data = response.json()
@@ -205,8 +205,6 @@ Nested JSON:
 df = pd.json_normalize(data)
 ```
 
-Workflow:
-
 ```text
 API
 → requests.get()
@@ -220,10 +218,9 @@ API
 
 # 3. Raw data
 
-Původní data je vhodné zachovat:
-
 ```python
 df_raw = pd.read_csv("data.csv")
+
 df = df_raw.copy()
 ```
 
@@ -319,6 +316,7 @@ Převod:
 
 ```python
 df["quantity"] = df["quantity"].astype(int)
+
 df["price"] = df["price"].astype(float)
 ```
 
@@ -393,6 +391,14 @@ df[
 ```
 
 → `DataFrame`
+
+```text
+vnitřní []
+→ list názvů sloupců
+
+vnější []
+→ výběr z DataFrame
+```
 
 ---
 
@@ -519,11 +525,9 @@ df[
 ]
 ```
 
-SQL:
-
 ```text
-IN     → isin()
-NOT IN → ~isin()
+SQL IN     → isin()
+SQL NOT IN → ~isin()
 ```
 
 ---
@@ -540,10 +544,10 @@ df[
 ```
 
 ```text
-inclusive="both"     → obě hranice
-inclusive="left"     → jen levá
-inclusive="right"    → jen pravá
-inclusive="neither"  → bez hranic
+inclusive="both"
+inclusive="left"
+inclusive="right"
+inclusive="neither"
 ```
 
 ---
@@ -557,19 +561,18 @@ df.loc[
 ]
 ```
 
-```text
-loc
-→ názvy sloupců
-→ podmínky
-```
-
-Úprava hodnot:
+Změna hodnot:
 
 ```python
 df.loc[
     df["quantity"] <= 0,
     "quantity"
 ] = pd.NA
+```
+
+```text
+loc
+→ názvy / podmínky
 ```
 
 ---
@@ -586,27 +589,26 @@ df.iloc[
 ```text
 iloc
 → číselné pozice
+
+start → zahrnuje se
+stop  → nezahrnuje se
 ```
 
 ---
 
 # 17. Řazení
 
-Vzestupně:
-
-```python
-df.sort_values(
-    by="total"
-)
-```
-
-Sestupně:
-
 ```python
 df.sort_values(
     by="total",
     ascending=False
 )
+```
+
+Výchozí:
+
+```text
+ascending=True
 ```
 
 ---
@@ -723,7 +725,7 @@ df["product"] = (
 )
 ```
 
-Nahrazení:
+Nahrazení konkrétní hodnoty:
 
 ```python
 df["region"] = (
@@ -830,8 +832,6 @@ raw data
 → outliers
 → závěrečná kontrola
 ```
-
-Princip:
 
 ```text
 znám správnou hodnotu
@@ -1080,6 +1080,7 @@ Diagnostika:
 
 ```python
 customers["id"].nunique()
+
 customers["id"].duplicated().sum()
 ```
 
@@ -1202,6 +1203,7 @@ Rozdíl:
 
 ```python
 my_list = ["A", "B"]
+
 my_tuple = ("A", "B")
 ```
 
@@ -1237,7 +1239,9 @@ pd.to_datetime()
 
 ```python
 df["year"] = df["order_date"].dt.year
+
 df["month"] = df["order_date"].dt.month
+
 df["day"] = df["order_date"].dt.day
 ```
 
@@ -1257,41 +1261,25 @@ df["year_month"] = (
 )
 ```
 
-Výsledek:
+```text
+%Y → rok
+%m → měsíc
+%d → den
+```
+
+Například:
 
 ```text
+2026-08-27
+→
 2026_08
 ```
 
-Další formát:
-
-```python
-df["date_text"] = (
-    df["order_date"]
-    .dt.strftime("%d.%m.%Y")
-)
-```
-
-```text
-%Y → rok, 4 číslice
-%m → měsíc, 2 číslice
-%d → den, 2 číslice
-```
-
-Důležité:
-
-```text
-strftime()
-→ vrací text
-```
-
-Původní datetime je proto vhodné nepřepisovat.
+`strftime()` vrací text.
 
 ---
 
-# 37. Den v týdnu
-
-Anglicky:
+# 37. Název dne
 
 ```python
 df["day_name"] = (
@@ -1323,7 +1311,7 @@ df["delivery_days"] = (
 ```
 
 ```text
-datetime - datetime
+datum - datum
 → timedelta
 
 .dt.days
@@ -1334,21 +1322,19 @@ datetime - datetime
 
 # 39. Filtrování podle data
 
-Od určitého data:
-
 ```python
 df[
     df["order_date"] >= "2026-08-01"
 ]
 ```
 
-Mezi dvěma daty:
+Interval:
 
 ```python
 df[
     df["order_date"].between(
-        "2026-08-01",
-        "2026-08-31"
+        "2026-08-05",
+        "2026-08-15"
     )
 ]
 ```
@@ -1358,8 +1344,8 @@ Bez hranic:
 ```python
 df[
     df["order_date"].between(
-        "2026-08-01",
-        "2026-08-31",
+        "2026-08-05",
+        "2026-08-15",
         inclusive="neither"
     )
 ]
@@ -1369,15 +1355,13 @@ df[
 
 # 40. Řazení podle data
 
-Od nejstaršího:
-
 ```python
 df = df.sort_values(
     by="order_date"
 )
 ```
 
-Od nejnovějšího:
+Sestupně:
 
 ```python
 df = df.sort_values(
@@ -1461,12 +1445,12 @@ df.to_sql(
 # 43. Import ↔ Export
 
 ```text
-NAČTENÍ                     ULOŽENÍ
+NAČTENÍ                      ULOŽENÍ
 
-pd.read_csv()        ←→     df.to_csv()
-pd.read_json()       ←→     df.to_json()
-pd.read_excel()      ←→     df.to_excel()
-pd.read_sql()        ←→     df.to_sql()
+pd.read_csv()        ←→      df.to_csv()
+pd.read_json()       ←→      df.to_json()
+pd.read_excel()      ←→      df.to_excel()
+pd.read_sql()        ←→      df.to_sql()
 ```
 
 ---
@@ -1634,6 +1618,9 @@ strftime()
 
 timedelta
 → rozdíl mezi daty
+
+.str
+→ přístup k textovým metodám
 ```
 
 ---
@@ -1642,15 +1629,130 @@ timedelta
 
 ```text
 zdroj dat
+
 → ingestion
+
 → raw data
+
 → kontrola struktury
+
 → cleaning
+
 → validation
+
 → merge
+
 → transformace
+
 → filtrování
+
 → groupby / agregace
+
 → analýza
+
 → export / reporting
+```
+
+---
+
+# 48. Práce s textem v Pandas
+
+Textové metody používají `.str`:
+
+```python
+df["column"].str.metoda()
+```
+
+Základní úpravy:
+
+```python
+df["name"].str.strip()
+df["name"].str.lower()
+df["name"].str.upper()
+df["name"].str.title()
+```
+
+```text
+strip() → odstraní mezery na začátku a konci
+lower() → malá písmena
+upper() → velká písmena
+title() → první písmeno každého slova velké
+```
+
+Hledání v textu:
+
+```python
+df["email"].str.contains(
+    "gmail.com",
+    na=False
+)
+
+df["email"].str.startswith(
+    "jan",
+    na=False
+)
+
+df["email"].str.endswith(
+    "gmail.com",
+    na=False
+)
+```
+
+```text
+contains()   → obsahuje
+startswith() → začíná
+endswith()   → končí
+```
+
+SQL analogie:
+
+```text
+LIKE '%text%' → .str.contains("text")
+LIKE 'text%'  → .str.startswith("text")
+LIKE '%text'  → .str.endswith("text")
+= 'text'      → == "text"
+```
+
+Nahrazení textu:
+
+```python
+df["email"] = (
+    df["email"]
+    .str.replace(
+        "@firma.cz",
+        "@company.cz",
+        regex=False
+    )
+)
+```
+
+Rozdělení textu:
+
+```python
+df[["email_name", "email_domain"]] = (
+    df["email"]
+    .str.split(
+        "@",
+        expand=True
+    )
+)
+```
+
+```text
+expand=True
+→ rozdělí výsledek do více sloupců
+```
+
+Délka textu:
+
+```python
+df["email_length"] = (
+    df["email"]
+    .str.len()
+)
+```
+
+```text
+.str.len()
+→ počet znaků
 ```
