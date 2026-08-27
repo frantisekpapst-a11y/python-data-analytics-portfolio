@@ -1,6 +1,6 @@
 # Python for Data Analytics Cheatsheet
 
-Praktický tahák pro práci s daty v Pythonu pomocí knihovny `pandas`.
+Praktický tahák pro práci s daty v Pythonu pomocí knihovny `pandas`. :contentReference[oaicite:0]{index=0}
 
 ---
 
@@ -10,12 +10,14 @@ Praktický tahák pro práci s daty v Pythonu pomocí knihovny `pandas`.
 import pandas as pd
 import sqlite3
 import requests
+import matplotlib.pyplot as plt
 ```
 
 ```text
-pandas   → tabulková data
-sqlite3  → SQLite databáze
-requests → API / HTTP požadavky
+pandas     → tabulková data
+sqlite3    → SQLite databáze
+requests   → API / HTTP požadavky
+matplotlib → grafy a vizualizace
 ```
 
 ---
@@ -1755,4 +1757,253 @@ df["email_length"] = (
 ```text
 .str.len()
 → počet znaků
+```
+
+---
+
+# 49. EDA — Exploratory Data Analysis
+
+EDA = rychlé prozkoumání dat před hlubší analýzou.
+
+```text
+struktura
+→ statistiky
+→ kategorie
+→ agregace
+→ outliers
+→ distribuce
+→ vztahy mezi proměnnými
+→ business interpretace
+```
+
+## Základní kontrola
+
+```python
+df.shape
+df.info()
+df.dtypes
+df.describe()
+```
+
+Kategorie:
+
+```python
+df["region"].value_counts()
+```
+
+Extrémní hodnoty:
+
+```python
+df.sort_values(
+    by="revenue",
+    ascending=False
+).head(3)
+```
+
+---
+
+## Mean, median a rozložení
+
+```text
+mean
+→ průměr
+→ citlivý na extrémní hodnoty
+
+median
+→ prostřední hodnota
+→ odolnější vůči outlierům
+
+mean výrazně > median
+→ často right-skewed distribuce
+
+mean výrazně < median
+→ často left-skewed distribuce
+```
+
+---
+
+## IQR a outliers
+
+Kvartily:
+
+```python
+q1 = df["revenue"].quantile(0.25)
+q3 = df["revenue"].quantile(0.75)
+
+iqr = q3 - q1
+```
+
+```text
+Q1  → 25. percentil
+Q3  → 75. percentil
+
+IQR = Q3 - Q1
+→ šířka prostředních 50 % dat
+```
+
+Hranice:
+
+```python
+lower_bound = q1 - 1.5 * iqr
+upper_bound = q3 + 1.5 * iqr
+```
+
+Outliers:
+
+```python
+outliers = df[
+    (df["revenue"] < lower_bound)
+    | (df["revenue"] > upper_bound)
+]
+```
+
+```text
+hodnota mimo hranice
+→ potenciální outlier
+
+outlier
+≠
+automaticky chyba
+```
+
+Pro outliery bývá často praktičtější:
+
+```text
+median + IQR
+```
+
+Pro celkovou variabilitu:
+
+```text
+mean + std
+```
+
+---
+
+## Korelace
+
+```python
+correlation = df[
+    ["quantity", "revenue"]
+].corr()
+```
+
+```text
+korelace blízko 1
+→ silný pozitivní lineární vztah
+
+korelace blízko 0
+→ slabý lineární vztah
+
+korelace blízko -1
+→ silný negativní lineární vztah
+```
+
+```text
+korelace
+≠
+kauzalita
+```
+
+Outlier může korelaci výrazně zesílit nebo oslabit.
+
+---
+
+## Distribuce
+
+Histogram:
+
+```python
+df["revenue"].hist(
+    bins=5
+)
+
+plt.show()
+```
+
+```text
+histogram
+→ ukazuje tvar distribuce
+
+bins
+→ počet intervalů
+```
+
+Typické tvary:
+
+```text
+symetrická
+→ mean ≈ median
+
+right-skewed
+→ dlouhý ocas doprava
+→ často mean > median
+
+left-skewed
+→ dlouhý ocas doleva
+→ často mean < median
+```
+
+---
+
+## Boxplot
+
+```python
+df.boxplot(
+    column="revenue"
+)
+
+plt.show()
+```
+
+```text
+spodní hrana boxu → Q1
+čára v boxu       → median
+horní hrana boxu  → Q3
+
+box
+→ prostředních 50 % dat
+
+samostatné body
+→ potenciální outliers
+```
+
+---
+
+## EDA checklist
+
+```text
+1. Struktura
+→ shape
+→ info()
+→ dtypes
+
+2. Statistiky
+→ describe()
+→ mean / median
+→ min / max / std
+
+3. Kategorie
+→ value_counts()
+
+4. Agregace
+→ groupby()
+→ sum / mean / count
+
+5. Outliers
+→ Q1 / Q3
+→ IQR
+→ hranice
+
+6. Distribuce
+→ histogram
+→ boxplot
+
+7. Vztahy
+→ corr()
+
+8. Interpretace
+→ co výsledek vytváří
+→ co je neobvyklé
+→ co je potřeba ověřit
 ```
