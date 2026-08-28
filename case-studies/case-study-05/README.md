@@ -5,7 +5,6 @@
 Tato case study se zaměřuje na analýzu dat zákaznické podpory.
 
 Cílem bylo:
-
 - zkontrolovat a vyčistit vstupní data,
 - analyzovat dobu řešení ticketů a spokojenost zákazníků,
 - identifikovat odlehlé hodnoty,
