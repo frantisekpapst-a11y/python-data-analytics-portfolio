@@ -122,3 +122,54 @@ sales.boxplot(
 )
 
 plt.show()
+
+print("""
+==========================================
+BUSINESS SUMMARY — LEKCE 15
+==========================================
+
+1. Praha má 3 objednávky s celkovými tržbami 4000.
+   Průměrná hodnota objednávky je cca 1333.
+
+2. Brno má 3 objednávky s celkovými tržbami 3000.
+   Průměrná hodnota objednávky je 1000.
+
+3. Ostrava má pouze 2 objednávky, ale celkové tržby 9300.
+   Na první pohled tedy vypadá jako nejsilnější region.
+
+4. Výsledek Ostravy je výrazně ovlivněn jednou
+   mimořádně vysokou objednávkou s revenue 8500.
+
+5. IQR metoda tuto objednávku označila jako potenciální outlier.
+
+6. Po odstranění outlieru má Ostrava:
+   - 1 objednávku;
+   - celkové tržby 800;
+   - průměrné tržby 800.
+
+    Bez outlieru je tedy Ostrava naopak nejslabší region.
+
+7. EDA ukázala, že jedna extrémní hodnota může výrazně
+   změnit business interpretaci výsledků.
+
+8. Mezi množstvím a tržbami existuje velmi silná
+   pozitivní korelace.
+
+   I bez outlieru zůstává vztah silný,takže outlier
+    vztah zesiluje, ale nevytváří ho sám.
+
+9. Distribuce revenue je right-skewed:
+    většina objednávek má nižší hodnotu, zatímco jedna
+    vysoká objednávka vytváří dlouhý ocas doprava.
+
+HLAVNÍ BUSINESS ZÁVĚR:
+
+Samotný součet tržeb nestačí k hodnocení výkonu regionu.
+
+Před rozhodnutím je potřeba zkontrolovat:
+- počet objednávek;
+- průměrnou hodnotu objednávky;
+- distribuci;
+- outliery;
+- zda výsledek není závislý na několika extrémních případech.
+""")
