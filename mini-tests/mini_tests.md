@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 15
+# Rychlý přehled Lekcí 6 až 16
 
 ```text
 Lekce 6
@@ -32,6 +32,9 @@ Lekce 14
 
 Lekce 15
 → EDA, describe(), value_counts(), groupby(), IQR, outliers, corr(), histogram
+
+Lekce 16
+→ SDA, H0, H1, p-value, Pearson, t-test, chi-square, ANOVA, Mann-Whitney U, Shapiro-Wilk
 ```
 
 ---
@@ -1230,3 +1233,234 @@ dlouhý ocas doprava
 → right-skewed distribuce
 → často mean > median
 ```
+
+---
+
+# Lekce 16 — SDA / praktické statistické testy
+
+## Test 1 — Výběr testu: 2 skupiny + číslo
+
+### Zadání
+
+Chceš zjistit:
+
+```text
+Liší se průměrné revenue mezi B2B a B2C zákazníky?
+```
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+t-test
+```
+
+### Krátce
+
+```text
+2 skupiny + číselná proměnná
+→ t-test
+```
+
+---
+
+## Test 2 — Výběr testu: 2 kategorie
+
+### Zadání
+
+Chceš zjistit:
+
+```text
+Souvisí region zákazníka s customer_type?
+```
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+chi-square
+```
+
+### Krátce
+
+```text
+2 kategoriální proměnné
+→ chi-square
+```
+
+---
+
+## Test 3 — Výběr testu: 2 čísla
+
+### Zadání
+
+Chceš zjistit:
+
+```text
+Souvisí quantity s revenue?
+```
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+Pearson
+```
+
+### Krátce
+
+```text
+2 číselné proměnné
+→ Pearsonova korelace
+```
+
+---
+
+## Test 4 — Výběr testu: 3+ skupiny
+
+### Zadání
+
+Chceš zjistit:
+
+```text
+Liší se průměrné revenue mezi Prahou, Brnem a Ostravou?
+```
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+ANOVA
+```
+
+### Krátce
+
+```text
+3+ skupiny + číselná proměnná
+→ ANOVA
+```
+
+---
+
+## Test 5 — Outliery / problematické rozložení
+
+### Zadání
+
+Máš 2 skupiny zákazníků a `revenue` obsahuje výrazné outliery.
+
+Chceš porovnat, jestli se skupiny liší.
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+Mann–Whitney U
+```
+
+### Krátce
+
+```text
+2 skupiny + outliery / nehezké rozložení
+→ Mann–Whitney U
+```
+
+---
+
+## Test 6 — Normalita
+
+### Zadání
+
+Chceš zjistit:
+
+```text
+Jsou hodnoty revenue přibližně normálně rozložené?
+```
+
+Jaký test použiješ?
+
+### Řešení
+
+```text
+Shapiro–Wilk
+```
+
+### Krátce
+
+```text
+kontrola normality
+→ Shapiro–Wilk
+```
+
+---
+
+## Test 7 — p-value pod 0.05
+
+### Zadání
+
+Výsledek testu je:
+
+```text
+p-value = 0.03
+```
+
+Co uděláš s H0?
+
+### Řešení
+
+```text
+0.03 < 0.05
+→ H0 zamítáme
+```
+
+### Krátce
+
+```text
+p-value < 0.05
+→ výsledek je statisticky významný
+→ máme důvod zamítnout H0
+```
+
+---
+
+## Test 8 — p-value nad 0.05
+
+### Zadání
+
+Výsledek testu je:
+
+```text
+p-value = 0.27
+```
+
+Co uděláš s H0?
+
+### Řešení
+
+```text
+0.27 > 0.05
+→ H0 nezamítáme
+```
+
+### Důležité
+
+To neznamená:
+
+```text
+H0 je pravda
+nebo
+H1 je nepravda
+```
+
+Znamená to jen:
+
+```text
+nemáme dost důkazů proti H0
+```
+
+---
+
