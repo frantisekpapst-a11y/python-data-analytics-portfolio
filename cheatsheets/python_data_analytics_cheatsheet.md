@@ -2007,3 +2007,274 @@ samostatné body
 → co je neobvyklé
 → co je potřeba ověřit
 ```
+
+---
+
+# 50. Statistické testy — praktické minimum
+
+Statistické testy pomáhají ověřit, zda rozdíl nebo vztah v datech může být skutečný, nebo mohl vzniknout náhodou.
+
+## H0, H1 a p-value
+
+```text
+H0
+→ nic zvláštního se neděje
+→ rozdíl / vztah není statisticky prokázán
+
+H1
+→ rozdíl / vztah existuje
+```
+
+Praktické pravidlo:
+
+```text
+p-value < 0.05
+→ zamítáme H0
+→ máme statistický důkaz rozdílu / vztahu
+
+p-value >= 0.05
+→ H0 nezamítáme
+→ nemáme dost důkazů
+```
+
+Důležité:
+
+```text
+statisticky významné
+≠
+businessově důležité
+
+korelace
+≠
+kauzalita
+```
+
+---
+
+## Jaký test použít?
+
+```text
+2 číselné proměnné
+→ Pearson
+→ souvisí spolu?
+
+2 skupiny + číslo
+→ t-test
+→ liší se jejich průměry?
+
+2 kategorie
+→ chi-square
+→ souvisejí spolu kategorie?
+
+3+ skupin + číslo
+→ ANOVA
+→ liší se průměry mezi skupinami?
+
+2 skupiny + problematická distribuce / outliers
+→ Mann–Whitney U
+→ alternativa k t-testu
+
+kontrola normality
+→ Shapiro-Wilk
+```
+
+---
+
+## Pearsonova korelace
+
+Pandas `.corr()` používá standardně Pearsonovu korelaci:
+
+```python
+df[
+    ["quantity", "revenue"]
+].corr()
+```
+
+Korelace + p-value:
+
+```python
+from scipy.stats import pearsonr
+
+r, p_value = pearsonr(
+    df["quantity"],
+    df["revenue"]
+)
+```
+
+```text
+r
+→ síla a směr lineárního vztahu
+
+r > 0 → pozitivní vztah
+r < 0 → negativní vztah
+
+p-value
+→ statistická významnost vztahu
+```
+
+---
+
+## t-test — dvě skupiny
+
+Například Praha vs. Brno:
+
+```python
+from scipy.stats import ttest_ind
+
+praha = df.loc[
+    df["region"] == "Praha",
+    "revenue"
+]
+
+brno = df.loc[
+    df["region"] == "Brno",
+    "revenue"
+]
+
+t_stat, p_value = ttest_ind(
+    praha,
+    brno,
+    equal_var=False
+)
+```
+
+```text
+otázka
+→ liší se průměrné revenue mezi 2 skupinami?
+```
+
+---
+
+## Chi-square — dvě kategorie
+
+Například:
+
+```text
+region × customer_type
+```
+
+```python
+from scipy.stats import chi2_contingency
+
+table = pd.crosstab(
+    df["region"],
+    df["customer_type"]
+)
+
+chi2, p_value, dof, expected = (
+    chi2_contingency(table)
+)
+```
+
+```text
+otázka
+→ souvisejí spolu dvě kategoriální proměnné?
+```
+
+---
+
+## ANOVA — více skupin
+
+```python
+from scipy.stats import f_oneway
+
+f_stat, p_value = f_oneway(
+    praha,
+    brno,
+    ostrava
+)
+```
+
+```text
+t-test
+→ 2 skupiny
+
+ANOVA
+→ 3+ skupin
+
+ANOVA řekne:
+→ alespoň jedna skupina se liší
+
+neřekne:
+→ která konkrétní
+```
+
+---
+
+## Mann–Whitney U
+
+```python
+from scipy.stats import mannwhitneyu
+
+u_stat, p_value = mannwhitneyu(
+    praha,
+    brno,
+    alternative="two-sided"
+)
+```
+
+```text
+→ alternativa k t-testu
+→ pracuje s pořadím hodnot
+→ vhodný při outlierech / problematické distribuci
+```
+
+---
+
+## Shapiro-Wilk — normalita
+
+```python
+from scipy.stats import shapiro
+
+stat, p_value = shapiro(
+    praha
+)
+```
+
+```text
+p-value < 0.05
+→ data pravděpodobně nejsou normálně rozložená
+
+p-value >= 0.05
+→ nemáme důkaz proti normalitě
+```
+
+---
+
+## Praktický tahák
+
+```text
+Co chci zjistit?
+
+souvisí 2 čísla?
+→ Pearson
+
+liší se 2 skupiny?
+→ t-test
+
+liší se 3+ skupin?
+→ ANOVA
+
+souvisejí 2 kategorie?
+→ chi-square
+
+mám 2 skupiny a divná data / outliery?
+→ Mann–Whitney
+
+chci zkontrolovat normalitu?
+→ Shapiro-Wilk
+```
+
+Při interpretaci vždy zkontroluj:
+
+```text
+p-value
++
+velikost vzorku
++
+outliery
++
+velikost skutečného rozdílu
++
+business význam
+```
