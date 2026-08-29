@@ -2278,3 +2278,266 @@ velikost skutečného rozdílu
 +
 business význam
 ```
+
+---
+
+# NumPy — praktické použití v datové analýze
+
+## Import
+
+```python
+import numpy as np
+```
+
+---
+
+## NumPy array
+
+```python
+sales = np.array([1200, 1500, 900, 1800, 2100])
+```
+
+Základní informace:
+
+```python
+sales.shape
+sales.size
+sales.ndim
+sales.dtype
+```
+
+---
+
+## Filtrování
+
+```python
+sales[sales > 1500]
+```
+
+Princip je podobný jako v Pandas:
+
+```python
+df[df["sales"] > 1500]
+```
+
+---
+
+## Výpočty nad celým polem
+
+```python
+sales * 1.10
+```
+
+```python
+profit = sales - costs
+```
+
+NumPy provádí výpočty nad všemi hodnotami bez nutnosti `for` smyčky.
+
+---
+
+## `np.where()` — jedna podmínka
+
+Praktické hlavně při tvorbě nového sloupce v Pandas:
+
+```python
+df["sales_level"] = np.where(
+    df["sales"] >= 1500,
+    "High",
+    "Low"
+)
+```
+
+Struktura:
+
+```text
+np.where(
+    podmínka,
+    hodnota když True,
+    hodnota když False
+)
+```
+
+```text
+1 podmínka
+→ np.where()
+```
+
+---
+
+## `np.select()` — více podmínek
+
+```python
+df["sales_category"] = np.select(
+    [
+        df["sales"] >= 1800,
+        df["sales"] >= 1200
+    ],
+    [
+        "High",
+        "Medium"
+    ],
+    default="Low"
+)
+```
+
+Struktura:
+
+```text
+np.select(
+    conditions,
+    choices,
+    default
+)
+```
+
+```text
+více podmínek
+→ np.select()
+```
+
+Pořadí podmínek je důležité.
+
+---
+
+## Chybějící hodnoty
+
+NumPy používá:
+
+```python
+np.nan
+```
+
+Například:
+
+```python
+values = np.array([10, 20, np.nan, 40])
+```
+
+Funkce ignorující `NaN`:
+
+```python
+np.nanmean(values)
+np.nanmedian(values)
+np.nansum(values)
+```
+
+Pozor:
+
+```python
+np.mean(values)
+```
+
+může vrátit:
+
+```text
+nan
+```
+
+V Pandas `mean()`, `median()` nebo `sum()` standardně `NaN` ignorují.
+
+---
+
+## Percentily
+
+```python
+q1 = np.percentile(sales, 25)
+q3 = np.percentile(sales, 75)
+
+iqr = q3 - q1
+```
+
+Pandas varianta:
+
+```python
+df["sales"].quantile(0.25)
+df["sales"].quantile(0.75)
+```
+
+---
+
+## 2D array a `axis`
+
+```python
+data = np.array([
+    [1200, 800],
+    [1500, 1000],
+    [900, 700]
+])
+```
+
+Průměr po sloupcích:
+
+```python
+np.mean(data, axis=0)
+```
+
+Průměr po řádcích:
+
+```python
+np.mean(data, axis=1)
+```
+
+```text
+axis=0
+→ výsledek pro jednotlivé sloupce
+
+axis=1
+→ výsledek pro jednotlivé řádky
+```
+
+---
+
+## Převod Pandas → NumPy
+
+```python
+array = df["sales"].to_numpy()
+```
+
+NumPy → Pandas:
+
+```python
+series = pd.Series(array)
+```
+
+---
+
+## Pandas vs. NumPy
+
+```text
+Pandas
+→ hlavní nástroj pro tabulková business data
+→ groupby
+→ merge
+→ missing values
+→ agregace
+→ filtry
+→ práce se sloupci
+
+NumPy
+→ pomocný nástroj pro číselné výpočty
+→ arrays
+→ np.where()
+→ np.select()
+→ numerické operace
+```
+
+Pro běžnou datovou analytiku:
+
+```text
+základ práce
+→ Pandas
+
+NumPy použít tam,
+kde zkrátí nebo zpřehlední řešení
+```
+
+Nejpraktičtější kombinace:
+
+```text
+Pandas DataFrame
++
+np.where()
++
+np.select()
+```
