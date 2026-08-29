@@ -1,41 +1,56 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 16
+# Rychlý přehled Lekcí 6 až 17
 
 ```text
 Lekce 6
+
 → Pandas základy
 
 Lekce 7
+
 → filtrování, loc, iloc
 
 Lekce 8
+
 → missing values
 
 Lekce 9
+
 → cleaning a validation
 
 Lekce 10
+
 → CSV, JSON, SQL, API
 
 Lekce 11
+
 → groupby(), agg(), GROUP BY, HAVING
 
 Lekce 12
+
 → merge(), JOIN, validate, suffixes
 
 Lekce 13
+
 → datetime, dt, strftime(), filtrování podle data
 
 Lekce 14
+
 → práce s textem, .str, strip(), title(), lower(), upper(), contains(), startswith(), endswith(), replace(), split(), len()
 
 Lekce 15
+
 → EDA, describe(), value_counts(), groupby(), IQR, outliers, corr(), histogram
 
 Lekce 16
+
 → SDA, H0, H1, p-value, Pearson, t-test, chi-square, ANOVA, Mann-Whitney U, Shapiro-Wilk
-```
+
+Lekce 17
+
+→ NumPy pro datovou analytiku, np.where(), np.select(), np.nan, array, dtype, axis, propojení NumPy a Pandas.
+```text
 
 ---
 
@@ -1464,3 +1479,310 @@ nemáme dost důkazů proti H0
 
 ---
 
+# Lekce 17 — NumPy pro datovou analytiku
+
+## Test 1 — `np.where()` v Pandas workflow
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "sales": [1200, 1800, 950, 2200, 1500]
+})
+```
+
+Vytvoř nový sloupec `sales_level`.
+
+Pravidla:
+
+```text
+sales >= 1500
+→ "High"
+
+jinak
+→ "Low"
+```
+
+Použij `np.where()`.
+
+### Řešení
+
+```python
+df["sales_level"] = np.where(
+    df["sales"] >= 1500,
+    "High",
+    "Low"
+)
+```
+
+### Krátce
+
+```text
+np.where(
+    podmínka,
+    hodnota když True,
+    hodnota když False
+)
+```
+
+V Pandas workflow je `np.where()` praktické hlavně tehdy, když chceme rychle vytvořit nový sloupec podle jedné podmínky.
+
+---
+
+## Test 2 — `np.where()` podle profitu
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+df = pd.DataFrame({
+    "profit": [200, 450, 700, 350, 900]
+})
+```
+
+Vytvoř nový sloupec `profit_level`.
+
+Pravidla:
+
+```text
+profit >= 500
+→ "Good"
+
+jinak
+→ "Low"
+```
+
+Použij `np.where()`.
+
+### Řešení
+
+```python
+df["profit_level"] = np.where(
+    df["profit"] >= 500,
+    "Good",
+    "Low"
+)
+```
+
+### Krátce
+
+```text
+1 podmínka
+→ np.where()
+```
+
+Je to kratší než řešení pomocí více kroků přes `loc`.
+
+---
+
+## Test 3 — `np.select()` pro více kategorií
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+df = pd.DataFrame({
+    "sales": [900, 1300, 1700, 2200]
+})
+```
+
+Vytvoř nový sloupec `sales_category`.
+
+Pravidla:
+
+```text
+sales >= 1800
+→ "High"
+
+sales >= 1200
+→ "Medium"
+
+jinak
+→ "Low"
+```
+
+Použij `np.select()`.
+
+### Řešení
+
+```python
+df["sales_category"] = np.select(
+    [
+        df["sales"] >= 1800,
+        df["sales"] >= 1200
+    ],
+    [
+        "High",
+        "Medium"
+    ],
+    default="Low"
+)
+```
+
+### Krátce
+
+```text
+více podmínek
+→ np.select()
+```
+
+Struktura:
+
+```text
+np.select(
+    conditions,
+    choices,
+    default
+)
+```
+
+Pořadí podmínek je důležité.
+
+---
+
+## Test 4 — Výběr mezi `np.where()` a `np.select()`
+
+### Zadání
+
+Chceš vytvořit nový sloupec podle pravidla:
+
+```text
+revenue >= 10000
+→ "High"
+
+jinak
+→ "Low"
+```
+
+Co je vhodnější?
+
+### Řešení
+
+```text
+np.where()
+```
+
+### Krátce
+
+```text
+1 podmínka
+→ np.where()
+
+více podmínek
+→ np.select()
+```
+
+---
+
+## Test 5 — Výběr nástroje v běžné datové analýze
+
+### Zadání
+
+Máš tabulková business data obsahující:
+
+```text
+customer_id
+region
+sales
+profit
+date
+```
+
+Chceš provádět:
+
+```text
+groupby
+merge
+missing values
+filtry
+agregace
+```
+
+Použiješ jako hlavní nástroj Pandas nebo NumPy?
+
+### Řešení
+
+```text
+Pandas
+```
+
+### Krátce
+
+```text
+tabulková business data
+→ Pandas
+
+čisté číselné výpočty / pomocné funkce
+→ NumPy
+```
+
+---
+
+## Test 6 — Kdy použít NumPy uvnitř Pandas
+
+### Zadání
+
+Chceš v Pandas DataFrame vytvořit nový kategoriální sloupec podle několika podmínek.
+
+Co může být praktičtější než několik po sobě jdoucích `loc` podmínek?
+
+### Řešení
+
+```text
+np.select()
+```
+
+### Krátce
+
+```text
+Pandas
+→ hlavní analytický nástroj
+
+NumPy
+→ pomocník tam, kde zkrátí nebo zpřehlední zápis
+```
+
+---
+
+## Shrnutí lekce
+
+Pro běžnou datovou analytiku:
+
+```text
+Pandas
+→ hlavní nástroj
+
+NumPy
+→ podpůrný nástroj
+```
+
+Nejpraktičtější NumPy funkce v Pandas workflow:
+
+```text
+np.where()
+→ jedna podmínka
+
+np.select()
+→ více podmínek
+```
+
+Ostatní operace jako:
+
+```text
+mean
+median
+std
+var
+unique
+sort
+quantile
+```
+
+je u tabulkových dat obvykle pohodlnější řešit přímo v Pandas.
