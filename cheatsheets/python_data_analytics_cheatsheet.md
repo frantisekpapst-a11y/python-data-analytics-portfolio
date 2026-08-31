@@ -2281,7 +2281,7 @@ business význam
 
 ---
 
-# NumPy — praktické použití v datové analýze
+# 51. NumPy — praktické použití v datové analýze
 
 ## Import
 
@@ -2544,7 +2544,7 @@ np.select()
 
 ---
 
-# Vizualizace — Matplotlib, Pandas plotting a Plotly
+# 52. Vizualizace — Matplotlib, Pandas plotting a Plotly
 
 ## Importy
 
@@ -3028,3 +3028,280 @@ statický graf s větší kontrolou
 interaktivní graf
 → Plotly
 ```
+
+---
+
+# 53. Excel / Power Query / Pandas
+
+## Kdy použít který nástroj
+
+```text
+Excel
+→ rychlá jednorázová analýza
+→ menší data
+→ vzorce, kontingenční tabulky, rychlý reporting
+
+Power Query
+→ opakovatelný cleaning a transformace
+→ Merge / Append
+→ refresh zdrojových dat
+
+Pandas
+→ složitější transformace a analýza
+→ automatizace
+→ API
+→ statistika
+→ větší flexibilita
+```
+
+```text
+business logika
+→ zůstává stejná
+
+mění se
+→ nástroj a syntaxe
+```
+
+---
+
+## Power Query — transformace
+
+Cleaning je část transformací.
+
+```text
+cleaning
+→ oprava / čištění dat
+
+transformace
+→ změna dat do podoby potřebné pro analýzu
+```
+
+Typické transformace:
+
+```text
+změna datových typů
+nový vypočtený sloupec
+filtrování
+seskupení
+Merge
+Append
+rozdělení / spojení sloupců
+Pivot / Unpivot
+```
+
+Power Query ukládá jednotlivé kroky.
+
+Po změně zdrojových dat:
+
+```text
+Data
+→ Aktualizovat vše
+```
+
+---
+
+## Merge — spojení tabulek vedle sebe
+
+Pandas:
+
+```python
+result = orders.merge(
+    customers,
+    on="customer_id",
+    how="left",
+    validate="many_to_one"
+)
+```
+
+```text
+Power Query
+→ Sloučit dotazy
+
+Pandas
+→ merge()
+
+SQL
+→ JOIN
+```
+
+```text
+merge()
+→ spojuje tabulky podle klíče
+→ přidává sloupce
+```
+
+---
+
+## Append / `pd.concat()` — tabulky pod sebe
+
+```python
+result = pd.concat(
+    [
+        orders_1,
+        orders_2
+    ],
+    ignore_index=True
+)
+```
+
+```text
+Power Query
+→ Připojit dotazy
+
+Pandas
+→ pd.concat()
+
+SQL
+→ UNION ALL
+```
+
+```text
+pd.concat()
+→ přidává řádky
+→ typicky tabulky se stejnou strukturou
+```
+
+`ignore_index=True` vytvoří nový souvislý index.
+
+---
+
+## Merge vs. concat
+
+```text
+merge()
+
+→ tabulky vedle sebe
+→ spojení podle klíče
+
+
+pd.concat()
+
+→ tabulky pod sebe
+→ přidání řádků
+```
+
+---
+
+## Wide vs. Long format
+
+Wide format:
+
+```text
+month     B2B   B2C   Partner
+
+2026-01   120    90      40
+2026-02   135    95      45
+2026-03   150   110      50
+```
+
+Long format:
+
+```text
+month     segment   revenue
+
+2026-01   B2B       120
+2026-01   B2C        90
+2026-01   Partner    40
+...
+```
+
+```text
+wide
+→ kategorie jsou v samostatných sloupcích
+
+long
+→ kategorie jsou v jednom sloupci
+→ hodnoty jsou v jednom sloupci
+```
+
+---
+
+## Wide → Long — `melt()`
+
+```python
+df_long = df.melt(
+    id_vars="month",
+    var_name="segment",
+    value_name="revenue"
+)
+```
+
+Power Query:
+
+```text
+Převést sloupce na řádky
+→ Unpivot
+```
+
+---
+
+## Long → Wide — `pivot()`
+
+```python
+df_wide = df_long.pivot(
+    index="month",
+    columns="segment",
+    values="revenue"
+).reset_index()
+```
+
+Power Query:
+
+```text
+Kontingenční sloupec
+→ Pivot
+```
+
+---
+
+## Python in Excel
+
+Excelová data lze načíst přímo do Pythonu:
+
+```python
+df = xl(
+    "A1:D10",
+    headers=True
+)
+```
+
+Potom lze používat běžný Pandas:
+
+```python
+df["total"] = (
+    df["quantity"]
+    * df["unit_price"]
+)
+```
+
+```python
+result = df.groupby(
+    "product",
+    as_index=False
+)["total"].sum()
+```
+
+Výstup:
+
+```text
+Objekt Pythonu
+→ výsledek zůstane jako Python objekt
+
+Excelová hodnota
+→ výsledek se zobrazí v buňkách Excelu
+```
+
+```text
+Python ve VS Code
+
+pd.read_csv()
+→ DataFrame
+
+
+Python in Excel
+
+xl()
+→ DataFrame
+```
+
+Samotná práce s DataFrame je potom prakticky stejná.
