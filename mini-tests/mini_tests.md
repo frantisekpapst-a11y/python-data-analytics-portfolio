@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 17
+# Rychlý přehled Lekcí 6 až 19
 
 ```text
 Lekce 6
@@ -49,8 +49,16 @@ Lekce 16
 
 Lekce 17
 
-→ NumPy pro datovou analytiku, np.where(), np.select(), np.nan, array, dtype, axis, propojení NumPy a Pandas.
-```text
+→ NumPy pro datovou analytiku, np.where(), np.select(), np.nan, array, dtype, axis, propojení NumPy a Pandas
+
+Lekce 18
+
+→ Matplotlib, Pandas plotting, line, bar, scatter, histogram, boxplot, pie, základní formátování grafů
+
+Lekce 19
+
+→ Plotly, interaktivní line, bar, scatter a pie chart, hover, legenda, více sérií, melt() a long formát
+```
 
 ---
 
@@ -1751,38 +1759,632 @@ NumPy
 
 ---
 
-## Shrnutí lekce
+**# Lekce 18 — Matplotlib a Pandas plotting**
 
-Pro běžnou datovou analytiku:
+**## Test 1 — Bar chart v Matplotlib**
 
-```text
-Pandas
-→ hlavní nástroj
+**### Zadání**
 
-NumPy
-→ podpůrný nástroj
+Máš DataFrame:
+
+```python
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+df = pd.DataFrame({
+
+    "region": ["Praha", "Brno", "Plzeň", "Ostrava"],
+
+    "revenue": [520000, 410000, 465000, 350000]
+
+})
+
 ```
 
-Nejpraktičtější NumPy funkce v Pandas workflow:
+Seřaď data podle `revenue` sestupně.
+
+Vytvoř bar chart.
+
+Použij:
 
 ```text
-np.where()
-→ jedna podmínka
 
-np.select()
-→ více podmínek
+region
+
+→ osa X
+
+revenue
+
+→ osa Y
+
 ```
 
-Ostatní operace jako:
+Přidej nadpis:
 
 ```text
-mean
-median
-std
-var
-unique
-sort
-quantile
+
+Tržby podle regionu
+
 ```
 
-je u tabulkových dat obvykle pohodlnější řešit přímo v Pandas.
+**### Řešení**
+
+```python
+
+df = df.sort_values(
+
+    by="revenue",
+
+    ascending=False
+
+)
+
+plt.bar(
+
+    df["region"],
+
+    df["revenue"]
+
+)
+
+plt.title(
+
+    "Tržby podle regionu",
+
+    fontweight="bold"
+
+)
+
+plt.show()
+
+```
+
+**### Krátce**
+
+```text
+
+plt.bar()
+
+→ sloupcový graf
+
+sort_values()
+
+→ seřazení dat před vykreslením
+
+plt.show()
+
+→ zobrazí graf
+
+```
+
+\---
+
+**## Test 2 — Scatter plot a trendová čára**
+
+**### Zadání**
+
+Máš DataFrame:
+
+```python
+
+import numpy as np
+
+df = pd.DataFrame({
+
+    "ad_spend": [10, 15, 20, 25, 30, 35],
+
+    "revenue": [80, 110, 150, 170, 210, 250]
+
+})
+
+```
+
+Vytvoř scatter plot.
+
+Potom vytvoř lineární trend pomocí:
+
+```text
+
+np.polyfit()
+
+np.poly1d()
+
+```
+
+a trendovou čáru přidej do grafu.
+
+**### Řešení**
+
+```python
+
+plt.scatter(
+
+    df["ad_spend"],
+
+    df["revenue"]
+
+)
+
+trend = np.polyfit(
+
+    df["ad_spend"],
+
+    df["revenue"],
+
+    1
+
+)
+
+trend_line = np.poly1d(trend)
+
+plt.plot(
+
+    df["ad_spend"],
+
+    trend_line(df["ad_spend"])
+
+)
+
+plt.show()
+
+```
+
+**### Krátce**
+
+```text
+
+plt.scatter()
+
+→ vztah mezi dvěma číselnými proměnnými
+
+np.polyfit(..., 1)
+
+→ lineární trend
+
+np.poly1d()
+
+→ vytvoří funkci trendové čáry
+
+```
+
+\---
+
+**## Test 3 — Histogram**
+
+**### Zadání**
+
+Máš DataFrame:
+
+```python
+
+df = pd.DataFrame({
+
+    "resolution_hours": [
+
+        2, 3, 4, 5, 6, 7, 8, 8,
+
+        9, 10, 12, 14, 18, 22, 30
+
+    ]
+
+})
+
+```
+
+Vytvoř histogram sloupce `resolution_hours`.
+
+Použij intervaly:
+
+```text
+
+0–5
+
+5–10
+
+10–15
+
+15–20
+
+20–25
+
+25–30
+
+30–35
+
+```
+
+**### Řešení**
+
+```python
+
+plt.hist(
+
+    df["resolution_hours"],
+
+    bins=[0, 5, 10, 15, 20, 25, 30, 35]
+
+)
+
+plt.show()
+
+```
+
+**### Krátce**
+
+```text
+
+plt.hist()
+
+→ histogram
+
+bins=
+
+→ určuje intervaly histogramu
+
+```
+
+\---
+
+**# Lekce 19 — Plotly**
+
+**## Test 1 — Line chart**
+
+**### Zadání**
+
+Máš DataFrame:
+
+```python
+
+import pandas as pd
+
+import plotly.express as px
+
+df = pd.DataFrame({
+
+    "month": ["2026-01", "2026-02", "2026-03", "2026-04"],
+
+    "revenue": [120000, 135000, 128000, 150000]
+
+})
+
+```
+
+Vytvoř interaktivní line chart.
+
+Použij:
+
+```text
+
+month
+
+→ osa X
+
+revenue
+
+→ osa Y
+
+```
+
+Zobraz body pomocí `markers=True`.
+
+Přidej nadpis:
+
+```text
+
+Měsíční tržby
+
+```
+
+**### Řešení**
+
+```python
+
+fig = px.line(
+
+    df,
+
+    x="month",
+
+    y="revenue",
+
+    markers=True,
+
+    title="Měsíční tržby"
+
+)
+
+fig.show()
+
+```
+
+**### Krátce**
+
+```text
+
+px.line()
+
+→ interaktivní line chart
+
+markers=True
+
+→ zobrazí body
+
+fig.show()
+
+→ zobrazí graf
+
+```
+
+\---
+
+**## Test 2 — Bar chart**
+
+**### Zadání**
+
+Máš DataFrame:
+
+```python
+
+df = pd.DataFrame({
+
+    "segment": ["B2B", "B2C", "Partner"],
+
+    "revenue": [520000, 350000, 130000]
+
+})
+
+```
+
+Vytvoř Plotly bar chart.
+
+Použij:
+
+```text
+
+segment
+
+→ osa X
+
+revenue
+
+→ osa Y
+
+```
+
+Přidej nadpis:
+
+```text
+
+Tržby podle segmentu
+
+```
+
+**### Řešení**
+
+```python
+
+fig = px.bar(
+
+    df,
+
+    x="segment",
+
+    y="revenue",
+
+    title="Tržby podle segmentu"
+
+)
+
+fig.show()
+
+```
+
+**### Krátce**
+
+```text
+
+px.bar()
+
+→ interaktivní sloupcový graf
+
+fig.show()
+
+→ zobrazí graf
+
+```
+
+\---
+
+**## Test 3 — Pie chart**
+
+**### Zadání**
+
+Máš DataFrame:
+
+```python
+
+df = pd.DataFrame({
+
+    "segment": ["B2B", "B2C", "Partner"],
+
+    "revenue": [520000, 350000, 130000]
+
+})
+
+```
+
+Vytvoř Plotly pie chart.
+
+Použij:
+
+```text
+
+segment
+
+→ názvy výsečí
+
+revenue
+
+→ hodnoty
+
+```
+
+Přidej nadpis:
+
+```text
+
+Podíl tržeb podle segmentu
+
+```
+
+**### Řešení**
+
+```python
+
+fig = px.pie(
+
+    df,
+
+    names="segment",
+
+    values="revenue",
+
+    title="Podíl tržeb podle segmentu"
+
+)
+
+fig.show()
+
+```
+
+**### Krátce**
+
+```text
+
+px.pie()
+
+→ interaktivní koláčový graf
+
+names=
+
+→ kategorie
+
+values=
+
+→ hodnoty
+
+```
+
+\---
+
+**## Test 4 — Více line sérií**
+
+**### Zadání**
+
+Máš DataFrame ve wide formátu:
+
+```python
+
+df = pd.DataFrame({
+
+    "month": ["2026-01", "2026-02", "2026-03"],
+
+    "B2B": [120, 135, 150],
+
+    "B2C": [90, 95, 110],
+
+    "Partner": [40, 45, 50]
+
+})
+
+```
+
+Převeď data pomocí `melt()` do long formátu.
+
+Výsledné sloupce:
+
+```text
+
+month
+
+segment
+
+revenue
+
+```
+
+Potom vytvoř Plotly line chart.
+
+Použij:
+
+```text
+
+month
+
+→ osa X
+
+revenue
+
+→ osa Y
+
+segment
+
+→ jednotlivé série
+
+```
+
+Zobraz body.
+
+**### Řešení**
+
+```python
+
+df_long = df.melt(
+
+    id_vars="month",
+
+    var_name="segment",
+
+    value_name="revenue"
+
+)
+
+fig = px.line(
+
+    df_long,
+
+    x="month",
+
+    y="revenue",
+
+    color="segment",
+
+    markers=True
+
+)
+
+fig.show()
+
+```
+
+**### Krátce**
+
+```text
+
+melt()
+
+→ wide → long format
+
+color="segment"
+
+→ samostatná série pro každý segment
+
+Plotly legenda
+
+→ umožňuje série skrývat a zobrazovat
+
+```
+
+\---
