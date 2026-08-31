@@ -2541,3 +2541,490 @@ np.where()
 +
 np.select()
 ```
+
+---
+
+# Vizualizace — Matplotlib, Pandas plotting a Plotly
+
+## Importy
+
+```python
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+import plotly.express as px
+import numpy as np
+```
+
+```text
+Matplotlib
+→ statické grafy
+→ velká kontrola nad vzhledem
+
+Pandas plotting
+→ rychlé grafy přímo z DataFrame
+→ používá Matplotlib
+
+Plotly
+→ interaktivní grafy
+→ hover, zoom, legenda
+```
+
+---
+
+## Matplotlib — základní grafy
+
+```python
+plt.plot(x, y)
+plt.bar(x, y)
+plt.scatter(x, y)
+plt.hist(values)
+plt.boxplot(values)
+plt.pie(values)
+```
+
+```text
+plot()    → line chart
+bar()     → sloupcový graf
+scatter() → scatter plot
+hist()    → histogram
+boxplot() → boxplot
+pie()     → koláčový graf
+```
+
+---
+
+## Základní formátování
+
+```python
+plt.figure(figsize=(8, 4))
+
+plt.title(
+    "Název grafu",
+    fontweight="bold"
+)
+
+plt.xticks(fontweight="bold")
+plt.yticks(fontweight="bold")
+
+plt.grid(
+    axis="y",
+    alpha=0.3
+)
+
+plt.gca().set_axisbelow(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+```text
+figsize
+→ velikost grafu
+
+fontweight="bold"
+→ tučné písmo
+
+grid()
+→ mřížka
+
+alpha
+→ průhlednost
+
+tight_layout()
+→ upraví rozložení
+
+show()
+→ zobrazí graf
+```
+
+---
+
+## Formát hodnot na ose
+
+Například:
+
+```text
+120000
+→ 120k
+```
+
+```python
+plt.gca().yaxis.set_major_formatter(
+    FuncFormatter(
+        lambda x, pos: f"{x / 1000:.0f}k"
+    )
+)
+```
+
+---
+
+## Trendová čára
+
+```python
+trend = np.polyfit(
+    df["ad_spend"],
+    df["revenue"],
+    1
+)
+
+trend_line = np.poly1d(trend)
+```
+
+```python
+plt.plot(
+    df["ad_spend"],
+    trend_line(df["ad_spend"])
+)
+```
+
+```text
+np.polyfit(..., 1)
+→ lineární trend
+
+np.poly1d()
+→ vytvoří použitelnou funkci trendu
+```
+
+---
+
+## Histogram
+
+```python
+plt.hist(
+    df["resolution_hours"],
+    bins=[0, 5, 10, 15, 20, 25, 30, 35],
+    rwidth=0.9,
+    edgecolor="black"
+)
+```
+
+```text
+bins
+→ intervaly
+
+rwidth
+→ šířka sloupců
+
+edgecolor
+→ obrys sloupců
+```
+
+Průměr a medián:
+
+```python
+plt.axvline(
+    mean_value,
+    linestyle="--",
+    label="Průměr",
+    zorder=5
+)
+
+plt.axvline(
+    median_value,
+    linestyle=":",
+    label="Medián",
+    zorder=5
+)
+
+plt.legend()
+```
+
+```text
+axvline()
+→ svislá čára
+
+zorder
+→ pořadí vrstev
+→ vyšší číslo = více vpředu
+```
+
+---
+
+## Koláčový graf
+
+```python
+plt.pie(
+    df["revenue"],
+    labels=df["segment"],
+    autopct="%1.1f%%",
+    explode=[0.03, 0.03, 0.03]
+)
+
+plt.show()
+```
+
+```text
+labels
+→ názvy výsečí
+
+autopct
+→ procenta
+
+explode
+→ oddělení výsečí
+```
+
+---
+
+## Pandas plotting
+
+```python
+df.plot(
+    x="month",
+    y="revenue"
+)
+
+plt.show()
+```
+
+Sloupcový graf:
+
+```python
+df.plot(
+    x="month",
+    y="revenue",
+    kind="bar"
+)
+
+plt.show()
+```
+
+```text
+df.plot()
+→ rychlá vizualizace přímo z DataFrame
+
+kind="line"
+kind="bar"
+kind="scatter"
+kind="hist"
+```
+
+Pandas plotting používá jako výchozí backend Matplotlib.
+
+---
+
+# Plotly — interaktivní grafy
+
+## Import
+
+```python
+import plotly.express as px
+```
+
+---
+
+## Line chart
+
+```python
+fig = px.line(
+    df,
+    x="month",
+    y="revenue",
+    markers=True,
+    title="Měsíční tržby"
+)
+
+fig.show()
+```
+
+```text
+fig
+→ objekt grafu
+
+fig.show()
+→ zobrazí interaktivní graf
+```
+
+---
+
+## Základní formátování
+
+```python
+fig.update_layout(
+    xaxis_title=None,
+    yaxis_title=None,
+    title_font=dict(
+        size=20
+    )
+)
+```
+
+Osa X jako kategorie:
+
+```python
+fig.update_xaxes(
+    type="category"
+)
+```
+
+Formát tisíců:
+
+```python
+fig.update_yaxes(
+    tickformat="~s"
+)
+```
+
+---
+
+## Bar chart
+
+```python
+fig = px.bar(
+    df,
+    x="region",
+    y="revenue",
+    title="Tržby podle regionu"
+)
+```
+
+Hodnoty nad sloupci:
+
+```python
+fig.update_traces(
+    texttemplate="%{y:.3s}",
+    textposition="outside"
+)
+```
+
+```python
+fig.show()
+```
+
+---
+
+## Scatter plot
+
+```python
+fig = px.scatter(
+    df,
+    x="ad_spend",
+    y="revenue",
+    title="Vztah marketingových nákladů a tržeb"
+)
+
+fig.show()
+```
+
+Trend přes NumPy:
+
+```python
+trend = np.polyfit(
+    df["ad_spend"],
+    df["revenue"],
+    1
+)
+
+trend_line = np.poly1d(trend)
+```
+
+```python
+fig.add_scatter(
+    x=df["ad_spend"],
+    y=trend_line(df["ad_spend"]),
+    mode="lines",
+    name="Trend"
+)
+```
+
+---
+
+## Pie chart
+
+```python
+fig = px.pie(
+    df,
+    names="segment",
+    values="revenue",
+    title="Podíl tržeb podle segmentu"
+)
+```
+
+```python
+fig.update_traces(
+    textposition="inside",
+    textinfo="label+percent+value"
+)
+
+fig.show()
+```
+
+---
+
+## Více line sérií
+
+Wide DataFrame:
+
+```text
+month
+B2B
+B2C
+Partner
+```
+
+Převod na long format:
+
+```python
+df_long = df.melt(
+    id_vars="month",
+    var_name="segment",
+    value_name="revenue"
+)
+```
+
+Graf:
+
+```python
+fig = px.line(
+    df_long,
+    x="month",
+    y="revenue",
+    color="segment",
+    markers=True,
+    title="Vývoj tržeb podle segmentu"
+)
+
+fig.show()
+```
+
+```text
+melt()
+→ wide → long format
+
+color="segment"
+→ samostatná série pro každý segment
+→ automatická legenda
+```
+
+---
+
+## Plotly interaktivita
+
+```text
+hover
+→ přesné hodnoty
+
+zoom
+→ přiblížení
+
+legenda
+→ klik = skrýt / zobrazit sérii
+
+dvojklik
+→ izolovat jednu sérii
+```
+
+---
+
+## Praktické použití
+
+```text
+rychlá kontrola dat
+→ Pandas plotting
+
+statický graf s větší kontrolou
+→ Matplotlib
+
+interaktivní graf
+→ Plotly
+```
