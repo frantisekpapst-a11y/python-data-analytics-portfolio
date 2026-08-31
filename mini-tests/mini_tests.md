@@ -3,6 +3,7 @@
 # Rychlý přehled Lekcí 6 až 19
 
 ```text
+
 Lekce 6
 
 → Pandas základy
@@ -58,6 +59,7 @@ Lekce 18
 Lekce 19
 
 → Plotly, interaktivní line, bar, scatter a pie chart, hover, legenda, více sérií, melt() a long formát
+
 ```
 
 ---
@@ -89,22 +91,24 @@ print(df.columns)
 df.info()
 ```
 
-### Krátce
-
-```text
-head()  → první řádky
-shape   → počet řádků a sloupců
-columns → názvy sloupců
-info()  → struktura a datové typy
-```
-
 ---
 
 ## Test 2 — Nový sloupec a agregace
 
 ### Zadání
 
-Vytvoř `total = quantity × unit_price` a vypočítej součet, průměr, maximum a minimum.
+Vytvoř:
+
+```text
+total = quantity × unit_price
+```
+
+Potom vypočítej:
+
+- součet,
+- průměr,
+- maximum,
+- minimum.
 
 ### Řešení
 
@@ -202,7 +206,15 @@ sorted_orders.to_csv(
 
 ### Zadání
 
-Vyber `Furniture` s `total > 15000`.
+Vyber řádky, kde:
+
+```text
+category = "Furniture"
+
+a zároveň
+
+total > 15000
+```
 
 ### Řešení
 
@@ -221,8 +233,15 @@ furniture_high_value = df[
 
 Vyber:
 
-- `quantity >= 4` nebo `total > 20000`,
-- vše mimo `Electronics`.
+```text
+quantity >= 4
+
+nebo
+
+total > 20000
+```
+
+Potom vytvoř druhý výběr obsahující vše mimo kategorii `Electronics`.
 
 ### Řešení
 
@@ -240,6 +259,22 @@ not_electronics = df[
 ---
 
 ## Test 3 — `isin()` a `between()`
+
+### Zadání
+
+Vyber produkty:
+
+```text
+Laptop
+Desk
+Office Chair
+```
+
+Potom z tohoto výběru ponech pouze řádky, kde:
+
+```text
+total je mezi 15000 a 30000
+```
 
 ### Řešení
 
@@ -264,6 +299,23 @@ selected_mid_value = selected_products[
 
 ## Test 4 — `loc`
 
+### Zadání
+
+Pomocí `loc` vyber řádky s:
+
+```text
+total > 10000
+```
+
+a zobraz pouze sloupce:
+
+```text
+order_id
+product
+category
+total
+```
+
 ### Řešení
 
 ```python
@@ -276,6 +328,13 @@ high_value_summary = df.loc[
 ---
 
 ## Test 5 — `iloc`
+
+### Zadání
+
+Pomocí `iloc` vyber:
+
+- prvních 5 řádků,
+- sloupce na pozicích 1 až 4.
 
 ### Řešení
 
@@ -290,15 +349,29 @@ first_five_selected = df.iloc[
 
 # Lekce 8 — Missing values
 
-## Test 1 — Kontrola
+## Test 1 — Kontrola missing values
+
+### Zadání
+
+Zjisti počet chybějících hodnot v jednotlivých sloupcích DataFrame `orders`.
+
+### Řešení
 
 ```python
-print(orders.isna().sum())
+print(
+    orders.isna().sum()
+)
 ```
 
 ---
 
 ## Test 2 — `dropna()`
+
+### Zadání
+
+Odstraň řádky, ve kterých chybí hodnota ve sloupci `product`.
+
+### Řešení
 
 ```python
 orders_clean = orders.dropna(
@@ -309,6 +382,16 @@ orders_clean = orders.dropna(
 ---
 
 ## Test 3 — `fillna()` textem
+
+### Zadání
+
+Vytvoř kopii `orders` a chybějící hodnoty ve sloupci `region` nahraď textem:
+
+```text
+Unknown
+```
+
+### Řešení
 
 ```python
 orders_filled = orders.copy()
@@ -323,6 +406,12 @@ orders_filled["region"] = (
 
 ## Test 4 — `fillna()` mediánem
 
+### Zadání
+
+Chybějící hodnoty ve sloupci `unit_price` doplň mediánem tohoto sloupce.
+
+### Řešení
+
 ```python
 orders_filled["unit_price"] = (
     orders_filled["unit_price"]
@@ -335,6 +424,17 @@ orders_filled["unit_price"] = (
 ---
 
 ## Test 5 — Cleaning workflow
+
+### Zadání
+
+Vytvoř kopii `orders` a proveď:
+
+1. doplnění `region` hodnotou `"Unknown"`,
+2. doplnění `unit_price` mediánem,
+3. odstranění řádků bez `product`,
+4. závěrečnou kontrolu missing values.
+
+### Řešení
 
 ```python
 orders_clean = orders.copy()
@@ -355,7 +455,9 @@ orders_clean = orders_clean.dropna(
     subset=["product"]
 )
 
-print(orders_clean.isna().sum())
+print(
+    orders_clean.isna().sum()
+)
 ```
 
 ---
@@ -364,8 +466,22 @@ print(orders_clean.isna().sum())
 
 ## Test 1 — Missing values
 
+### Zadání
+
+Zjisti missing values.
+
+Potom:
+
+- odstraň řádky bez `product`,
+- doplň chybějící `quantity` hodnotou `1`,
+- výsledek ulož do `clean_df`.
+
+### Řešení
+
 ```python
-print(df.isna().sum())
+print(
+    df.isna().sum()
+)
 
 df = df.dropna(
     subset=["product"]
@@ -380,9 +496,25 @@ clean_df = df
 
 ## Test 2 — Duplicity
 
+### Zadání
+
+Zjisti:
+
+- které řádky jsou duplicitní,
+- kolik duplicit dataset obsahuje.
+
+Potom duplicity odstraň.
+
+### Řešení
+
 ```python
-print(df[df.duplicated()])
-print(df.duplicated().sum())
+print(
+    df[df.duplicated()]
+)
+
+print(
+    df.duplicated().sum()
+)
 
 clean_df = df.drop_duplicates()
 ```
@@ -390,6 +522,25 @@ clean_df = df.drop_duplicates()
 ---
 
 ## Test 3 — Datové typy
+
+### Zadání
+
+Převeď:
+
+```text
+order_id
+→ int
+
+quantity
+→ int
+
+unit_price
+→ float
+```
+
+Potom zobraz datové typy.
+
+### Řešení
 
 ```python
 df["order_id"] = df["order_id"].astype(int)
@@ -403,6 +554,20 @@ print(df.dtypes)
 
 ## Test 4 — Validace hodnot
 
+### Zadání
+
+Najdi řádky, kde:
+
+```text
+quantity <= 0
+
+nebo
+
+unit_price <= 0
+```
+
+### Řešení
+
 ```python
 invalid_rows = df[
     (df["quantity"] <= 0)
@@ -414,8 +579,24 @@ invalid_rows = df[
 
 ## Test 5 — Cleaning workflow
 
+### Zadání
+
+Proveď základní cleaning workflow:
+
+1. kontrola missing values,
+2. odstranění duplicit,
+3. odstranění řádků bez `product`,
+4. doplnění `quantity`,
+5. odstranění neplatného `quantity`,
+6. vytvoření `total`,
+7. uložení výsledku do `clean_df`.
+
+### Řešení
+
 ```python
-print(df.isna().sum())
+print(
+    df.isna().sum()
+)
 
 df = df.drop_duplicates()
 
@@ -443,6 +624,21 @@ clean_df = df
 
 ## Test 1 — CSV
 
+### Zadání
+
+Načti `sales.csv`.
+
+Použij:
+
+```text
+oddělovač ;
+encoding cp1250
+```
+
+Potom proveď základní kontrolu dat.
+
+### Řešení
+
 ```python
 df = pd.read_csv(
     "sales.csv",
@@ -461,8 +657,22 @@ df.info()
 
 ## Test 2 — JSON
 
+### Zadání
+
+Načti soubor:
+
+```text
+sales.json
+```
+
+Potom zobraz první řádky a informace o DataFrame.
+
+### Řešení
+
 ```python
-df = pd.read_json("sales.json")
+df = pd.read_json(
+    "sales.json"
+)
 
 print(df.head())
 
@@ -473,6 +683,14 @@ df.info()
 
 ## Test 3 — Nested JSON
 
+### Zadání
+
+Máš nested JSON uložený v proměnné `data`.
+
+Převeď ho na plochý DataFrame.
+
+### Řešení
+
 ```python
 df = pd.json_normalize(data)
 ```
@@ -480,6 +698,24 @@ df = pd.json_normalize(data)
 ---
 
 ## Test 4 — SQLite + SQL
+
+### Zadání
+
+Připoj se k databázi:
+
+```text
+ecommerce_practice.db
+```
+
+Pomocí SQL načti z tabulky `orders` pouze řádky, kde:
+
+```text
+quantity > 2
+```
+
+Výsledek načti do DataFrame a připojení uzavři.
+
+### Řešení
 
 ```python
 import sqlite3
@@ -507,6 +743,24 @@ connection.close()
 
 ## Test 5 — API + raw data
 
+### Zadání
+
+Načti data z API:
+
+```text
+https://jsonplaceholder.typicode.com/posts
+```
+
+Potom:
+
+1. zobraz status code,
+2. převeď odpověď na JSON,
+3. vytvoř `df_raw`,
+4. vytvoř pracovní kopii `df`,
+5. zobraz první řádky.
+
+### Řešení
+
 ```python
 import requests
 import pandas as pd
@@ -515,14 +769,19 @@ url = "https://jsonplaceholder.typicode.com/posts"
 
 response = requests.get(url)
 
-print(response.status_code)
+print(
+    response.status_code
+)
 
 data = response.json()
 
 df_raw = pd.DataFrame(data)
+
 df = df_raw.copy()
 
-print(df.head())
+print(
+    df.head()
+)
 ```
 
 ---
@@ -530,6 +789,14 @@ print(df.head())
 # Lekce 11 — `groupby()` a `agg()`
 
 ## Test 1 — Základní `groupby()`
+
+### Zadání
+
+Spočítej celkové `total` pro každou kategorii.
+
+Výsledek vrať jako běžný DataFrame.
+
+### Řešení
 
 ```python
 sales_by_category = (
@@ -543,10 +810,26 @@ sales_by_category = (
 
 ## Test 2 — Více agregací
 
+### Zadání
+
+Pro každou kategorii spočítej z `total`:
+
+```text
+sum
+mean
+max
+```
+
+### Řešení
+
 ```python
 category_summary = (
     df.groupby("category")["total"]
-    .agg(["sum", "mean", "max"])
+    .agg([
+        "sum",
+        "mean",
+        "max"
+    ])
     .reset_index()
 )
 ```
@@ -554,6 +837,23 @@ category_summary = (
 ---
 
 ## Test 3 — Pojmenované agregace
+
+### Zadání
+
+Pro každou kategorii vytvoř:
+
+```text
+total_revenue
+→ součet total
+
+avg_order_value
+→ průměr total
+
+max_quantity
+→ maximum quantity
+```
+
+### Řešení
 
 ```python
 category_summary = (
@@ -570,6 +870,22 @@ category_summary = (
 ---
 
 ## Test 4 — WHERE vs. HAVING
+
+### Zadání
+
+Nejdříve vyber pouze řádky, kde:
+
+```text
+quantity >= 2
+```
+
+Potom:
+
+1. seskup podle `category`,
+2. spočítej `total`,
+3. ponech pouze kategorie s `total > 30000`.
+
+### Řešení
 
 ```python
 filtered = df[
@@ -590,6 +906,17 @@ high_value_categories = grouped[
 ---
 
 ## Test 5 — Více grouping sloupců
+
+### Zadání
+
+Spočítej celkové `total` podle kombinace:
+
+```text
+category
+region
+```
+
+### Řešení
 
 ```python
 summary = (
@@ -634,8 +961,11 @@ Spoj:
 
 ```text
 orders.customer_id
+
 customers.id
 ```
+
+Zachovej všechny objednávky.
 
 ### Řešení
 
@@ -661,6 +991,7 @@ Použij suffixy:
 
 ```text
 _order
+
 _customer
 ```
 
@@ -685,7 +1016,11 @@ result = orders.merge(
 
 ### Zadání
 
-Zjisti missing values a doplň chybějící `customer_name` a `region` hodnotou `"Unknown"`.
+Zjisti missing values a doplň chybějící `customer_name` a `region` hodnotou:
+
+```text
+Unknown
+```
 
 ### Řešení
 
@@ -717,9 +1052,13 @@ Spoj:
 
 ```text
 orders
+
 → customers
+
 → products
 ```
+
+Použij `left` merge a validaci `many_to_one`.
 
 ### Řešení
 
@@ -747,7 +1086,11 @@ final_df = orders_customers.merge(
 
 ### Zadání
 
-Převeď `order_date` z textu na `datetime` a vytvoř `year_month` ve formátu `2026_08`.
+Převeď `order_date` z textu na `datetime` a vytvoř `year_month` ve formátu:
+
+```text
+2026_08
+```
 
 ### Řešení
 
@@ -785,7 +1128,17 @@ orders["delivery_days"] = (
 
 ### Zadání
 
-Vyber objednávky mezi `2026-08-05` a `2026-08-15` bez zahrnutí hranic.
+Vyber objednávky mezi:
+
+```text
+2026-08-05
+
+a
+
+2026-08-15
+```
+
+bez zahrnutí hranic.
 
 ### Řešení
 
@@ -858,8 +1211,11 @@ monthly_sales = (
 
 ```text
 order_id
+
 order_date
+
 delivery_days
+
 revenue
 ```
 
@@ -941,7 +1297,11 @@ customers["email"] = (
 
 ### Zadání
 
-Vyber pouze zákazníky, jejichž email končí na `gmail.com`.
+Vyber pouze zákazníky, jejichž email končí na:
+
+```text
+gmail.com
+```
 
 ### Řešení
 
@@ -964,6 +1324,7 @@ Rozděl `email` podle `@` do sloupců:
 
 ```text
 email_name
+
 email_domain
 ```
 
@@ -998,7 +1359,6 @@ customers["email_length"] = (
 
 ---
 
-
 # Lekce 15 — EDA (Exploratory Data Analysis)
 
 ## Test 1 — `describe()` a interpretace
@@ -1007,7 +1367,17 @@ customers["email_length"] = (
 
 Zobraz základní statistický přehled pro `revenue`.
 
-Potom vysvětli, co může naznačit výraznější rozdíl mezi průměrem a mediánem.
+Potom interpretuj situaci:
+
+```text
+mean výrazně > median
+```
+
+a:
+
+```text
+mean výrazně < median
+```
 
 ### Řešení
 
@@ -1017,18 +1387,16 @@ print(
 )
 ```
 
-### Krátce
-
 ```text
 mean výrazně > median
+
 → může upozornit na right-skewed distribuci
 → případně na vysoký outlier
 
 mean výrazně < median
+
 → může upozornit na left-skewed distribuci
 ```
-
-Rozdíl mezi průměrem a mediánem je varovný signál, ne automatický důkaz outlieru.
 
 ---
 
@@ -1050,22 +1418,7 @@ orders_summary = (
 )
 ```
 
-### Krátce
-
-```text
-count()
-→ počítá neprázdné hodnoty konkrétního sloupce
-
-size()
-→ počítá řádky ve skupině
-
-value_counts()
-→ počítá četnost hodnot ve vybraném sloupci
-```
-
-Pokud `order_id` obsahuje `NaN`, může `count()` dát jiný výsledek než počet řádků.
-
-Pro počet řádků ve skupině:
+Alternativa pro počet řádků:
 
 ```python
 orders_summary = (
@@ -1105,19 +1458,6 @@ region_summary = (
 )
 ```
 
-### Krátce
-
-```text
-count
-→ počet neprázdných order_id
-
-sum
-→ celkové revenue
-
-mean
-→ průměrné revenue
-```
-
 ---
 
 ## Test 4 — IQR a outliers
@@ -1138,34 +1478,19 @@ a vyber potenciální outliery.
 
 ```python
 q1 = sales["revenue"].quantile(0.25)
+
 q3 = sales["revenue"].quantile(0.75)
 
 iqr = q3 - q1
 
 lower_bound = q1 - 1.5 * iqr
+
 upper_bound = q3 + 1.5 * iqr
 
 outliers = sales[
     (sales["revenue"] < lower_bound)
     | (sales["revenue"] > upper_bound)
 ]
-```
-
-### Krátce
-
-```text
-Q1
-→ 25. percentil
-
-Q3
-→ 75. percentil
-
-IQR
-→ Q3 - Q1
-
-mimo hranice
-→ potenciální outlier
-→ ne automaticky chyba
 ```
 
 ---
@@ -1178,10 +1503,15 @@ Zjisti korelaci mezi:
 
 ```text
 quantity
+
 revenue
 ```
 
-Potom interpretuj hodnotu kolem `0.92`.
+Potom interpretuj hodnotu kolem:
+
+```text
+0.92
+```
 
 ### Řešení
 
@@ -1191,31 +1521,14 @@ correlation = sales[
 ].corr()
 ```
 
-### Krátce
-
 ```text
 0.92
+
 → velmi silná pozitivní lineární korelace
+
 → proměnné mají tendenci růst společně
-```
 
-Důležité:
-
-```text
-korelace
-≠
-kauzalita
-
-silná korelace
-≠
-přímá úměra
-```
-
-Vhodná formulace:
-
-```text
-Mezi quantity a revenue existuje
-velmi silný pozitivní vztah.
+→ neznamená automaticky kauzalitu
 ```
 
 ---
@@ -1230,7 +1543,9 @@ Potom interpretuj situaci:
 
 ```text
 většina hodnot vlevo
+
 +
+
 dlouhý ocas doprava
 ```
 
@@ -1246,14 +1561,15 @@ sales["revenue"].hist(
 plt.show()
 ```
 
-### Krátce
-
 ```text
 většina hodnot vlevo
+
 +
+
 dlouhý ocas doprava
 
 → right-skewed distribuce
+
 → často mean > median
 ```
 
@@ -1279,13 +1595,6 @@ Jaký test použiješ?
 t-test
 ```
 
-### Krátce
-
-```text
-2 skupiny + číselná proměnná
-→ t-test
-```
-
 ---
 
 ## Test 2 — Výběr testu: 2 kategorie
@@ -1304,13 +1613,6 @@ Jaký test použiješ?
 
 ```text
 chi-square
-```
-
-### Krátce
-
-```text
-2 kategoriální proměnné
-→ chi-square
 ```
 
 ---
@@ -1333,13 +1635,6 @@ Jaký test použiješ?
 Pearson
 ```
 
-### Krátce
-
-```text
-2 číselné proměnné
-→ Pearsonova korelace
-```
-
 ---
 
 ## Test 4 — Výběr testu: 3+ skupiny
@@ -1360,20 +1655,13 @@ Jaký test použiješ?
 ANOVA
 ```
 
-### Krátce
-
-```text
-3+ skupiny + číselná proměnná
-→ ANOVA
-```
-
 ---
 
 ## Test 5 — Outliery / problematické rozložení
 
 ### Zadání
 
-Máš 2 skupiny zákazníků a `revenue` obsahuje výrazné outliery.
+Máš dvě skupiny zákazníků a `revenue` obsahuje výrazné outliery.
 
 Chceš porovnat, jestli se skupiny liší.
 
@@ -1383,13 +1671,6 @@ Jaký test použiješ?
 
 ```text
 Mann–Whitney U
-```
-
-### Krátce
-
-```text
-2 skupiny + outliery / nehezké rozložení
-→ Mann–Whitney U
 ```
 
 ---
@@ -1412,13 +1693,6 @@ Jaký test použiješ?
 Shapiro–Wilk
 ```
 
-### Krátce
-
-```text
-kontrola normality
-→ Shapiro–Wilk
-```
-
 ---
 
 ## Test 7 — p-value pod 0.05
@@ -1437,15 +1711,10 @@ Co uděláš s H0?
 
 ```text
 0.03 < 0.05
+
 → H0 zamítáme
-```
 
-### Krátce
-
-```text
-p-value < 0.05
 → výsledek je statisticky významný
-→ máme důvod zamítnout H0
 ```
 
 ---
@@ -1466,23 +1735,10 @@ Co uděláš s H0?
 
 ```text
 0.27 > 0.05
+
 → H0 nezamítáme
-```
 
-### Důležité
-
-To neznamená:
-
-```text
-H0 je pravda
-nebo
-H1 je nepravda
-```
-
-Znamená to jen:
-
-```text
-nemáme dost důkazů proti H0
+→ nemáme dost důkazů proti H0
 ```
 
 ---
@@ -1510,9 +1766,11 @@ Pravidla:
 
 ```text
 sales >= 1500
+
 → "High"
 
 jinak
+
 → "Low"
 ```
 
@@ -1527,18 +1785,6 @@ df["sales_level"] = np.where(
     "Low"
 )
 ```
-
-### Krátce
-
-```text
-np.where(
-    podmínka,
-    hodnota když True,
-    hodnota když False
-)
-```
-
-V Pandas workflow je `np.where()` praktické hlavně tehdy, když chceme rychle vytvořit nový sloupec podle jedné podmínky.
 
 ---
 
@@ -1560,9 +1806,11 @@ Pravidla:
 
 ```text
 profit >= 500
+
 → "Good"
 
 jinak
+
 → "Low"
 ```
 
@@ -1577,15 +1825,6 @@ df["profit_level"] = np.where(
     "Low"
 )
 ```
-
-### Krátce
-
-```text
-1 podmínka
-→ np.where()
-```
-
-Je to kratší než řešení pomocí více kroků přes `loc`.
 
 ---
 
@@ -1607,12 +1846,15 @@ Pravidla:
 
 ```text
 sales >= 1800
+
 → "High"
 
 sales >= 1200
+
 → "Medium"
 
 jinak
+
 → "Low"
 ```
 
@@ -1634,25 +1876,6 @@ df["sales_category"] = np.select(
 )
 ```
 
-### Krátce
-
-```text
-více podmínek
-→ np.select()
-```
-
-Struktura:
-
-```text
-np.select(
-    conditions,
-    choices,
-    default
-)
-```
-
-Pořadí podmínek je důležité.
-
 ---
 
 ## Test 4 — Výběr mezi `np.where()` a `np.select()`
@@ -1663,9 +1886,11 @@ Chceš vytvořit nový sloupec podle pravidla:
 
 ```text
 revenue >= 10000
+
 → "High"
 
 jinak
+
 → "Low"
 ```
 
@@ -1675,16 +1900,6 @@ Co je vhodnější?
 
 ```text
 np.where()
-```
-
-### Krátce
-
-```text
-1 podmínka
-→ np.where()
-
-více podmínek
-→ np.select()
 ```
 
 ---
@@ -1697,9 +1912,13 @@ Máš tabulková business data obsahující:
 
 ```text
 customer_id
+
 region
+
 sales
+
 profit
+
 date
 ```
 
@@ -1707,9 +1926,13 @@ Chceš provádět:
 
 ```text
 groupby
+
 merge
+
 missing values
+
 filtry
+
 agregace
 ```
 
@@ -1719,16 +1942,6 @@ Použiješ jako hlavní nástroj Pandas nebo NumPy?
 
 ```text
 Pandas
-```
-
-### Krátce
-
-```text
-tabulková business data
-→ Pandas
-
-čisté číselné výpočty / pomocné funkce
-→ NumPy
 ```
 
 ---
@@ -1747,50 +1960,31 @@ Co může být praktičtější než několik po sobě jdoucích `loc` podmínek
 np.select()
 ```
 
-### Krátce
-
-```text
-Pandas
-→ hlavní analytický nástroj
-
-NumPy
-→ pomocník tam, kde zkrátí nebo zpřehlední zápis
-```
-
 ---
 
-**# Lekce 18 — Matplotlib a Pandas plotting**
+# Lekce 18 — Matplotlib a Pandas plotting
 
-**## Test 1 — Bar chart v Matplotlib**
+## Test 1 — Bar chart v Matplotlib
 
-**### Zadání**
+### Zadání
 
 Máš DataFrame:
 
 ```python
-
 import pandas as pd
-
 import matplotlib.pyplot as plt
 
 df = pd.DataFrame({
-
     "region": ["Praha", "Brno", "Plzeň", "Ostrava"],
-
     "revenue": [520000, 410000, 465000, 350000]
-
 })
-
 ```
 
 Seřaď data podle `revenue` sestupně.
 
-Vytvoř bar chart.
-
-Použij:
+Vytvoř bar chart:
 
 ```text
-
 region
 
 → osa X
@@ -1798,87 +1992,105 @@ region
 revenue
 
 → osa Y
-
 ```
 
-Přidej nadpis:
+Přidej tučný nadpis:
 
 ```text
-
 Tržby podle regionu
-
 ```
 
-**### Řešení**
+### Řešení
 
 ```python
-
 df = df.sort_values(
-
     by="revenue",
-
     ascending=False
-
 )
 
 plt.bar(
-
     df["region"],
-
     df["revenue"]
-
 )
 
 plt.title(
-
     "Tržby podle regionu",
-
     fontweight="bold"
-
 )
 
 plt.show()
-
 ```
 
-**### Krátce**
+---
 
-```text
+## Test 2 — Line chart v Matplotlib
 
-plt.bar()
-
-→ sloupcový graf
-
-sort_values()
-
-→ seřazení dat před vykreslením
-
-plt.show()
-
-→ zobrazí graf
-
-```
-
-\---
-
-**## Test 2 — Scatter plot a trendová čára**
-
-**### Zadání**
+### Zadání
 
 Máš DataFrame:
 
 ```python
+df = pd.DataFrame({
+    "month": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04"
+    ],
+    "revenue": [
+        120000,
+        135000,
+        128000,
+        150000
+    ]
+})
+```
 
+Vytvoř line chart s body.
+
+Použij:
+
+```text
+month
+
+→ osa X
+
+revenue
+
+→ osa Y
+```
+
+### Řešení
+
+```python
+plt.plot(
+    df["month"],
+    df["revenue"],
+    marker="o"
+)
+
+plt.title(
+    "Měsíční tržby"
+)
+
+plt.show()
+```
+
+---
+
+## Test 3 — Scatter plot a trendová čára
+
+### Zadání
+
+Máš DataFrame:
+
+```python
 import numpy as np
 
 df = pd.DataFrame({
-
     "ad_spend": [10, 15, 20, 25, 30, 35],
-
     "revenue": [80, 110, 150, 170, 210, 250]
-
 })
-
 ```
 
 Vytvoř scatter plot.
@@ -1886,99 +2098,59 @@ Vytvoř scatter plot.
 Potom vytvoř lineární trend pomocí:
 
 ```text
-
 np.polyfit()
 
 np.poly1d()
-
 ```
 
 a trendovou čáru přidej do grafu.
 
-**### Řešení**
+### Řešení
 
 ```python
-
 plt.scatter(
-
     df["ad_spend"],
-
     df["revenue"]
-
 )
 
 trend = np.polyfit(
-
     df["ad_spend"],
-
     df["revenue"],
-
     1
-
 )
 
 trend_line = np.poly1d(trend)
 
 plt.plot(
-
     df["ad_spend"],
-
     trend_line(df["ad_spend"])
-
 )
 
 plt.show()
-
 ```
 
-**### Krátce**
+---
 
-```text
+## Test 4 — Histogram
 
-plt.scatter()
-
-→ vztah mezi dvěma číselnými proměnnými
-
-np.polyfit(..., 1)
-
-→ lineární trend
-
-np.poly1d()
-
-→ vytvoří funkci trendové čáry
-
-```
-
-\---
-
-**## Test 3 — Histogram**
-
-**### Zadání**
+### Zadání
 
 Máš DataFrame:
 
 ```python
-
 df = pd.DataFrame({
-
     "resolution_hours": [
-
         2, 3, 4, 5, 6, 7, 8, 8,
-
         9, 10, 12, 14, 18, 22, 30
-
     ]
-
 })
-
 ```
 
-Vytvoř histogram sloupce `resolution_hours`.
+Vytvoř histogram.
 
 Použij intervaly:
 
 ```text
-
 0–5
 
 5–10
@@ -1992,63 +2164,83 @@ Použij intervaly:
 25–30
 
 30–35
-
 ```
 
-**### Řešení**
+### Řešení
 
 ```python
-
 plt.hist(
-
     df["resolution_hours"],
-
-    bins=[0, 5, 10, 15, 20, 25, 30, 35]
-
+    bins=[
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35
+    ]
 )
 
 plt.show()
-
 ```
 
-**### Krátce**
+---
+
+## Test 5 — Pandas plotting
+
+### Zadání
+
+Máš DataFrame obsahující:
 
 ```text
+month
 
-plt.hist()
-
-→ histogram
-
-bins=
-
-→ určuje intervaly histogramu
-
+revenue
 ```
 
-\---
+Vytvoř rychlý line chart přímo pomocí Pandas.
 
-**# Lekce 19 — Plotly**
+### Řešení
 
-**## Test 1 — Line chart**
+```python
+df.plot(
+    x="month",
+    y="revenue"
+)
 
-**### Zadání**
+plt.show()
+```
+
+---
+
+# Lekce 19 — Plotly
+
+## Test 1 — Line chart
+
+### Zadání
 
 Máš DataFrame:
 
 ```python
-
 import pandas as pd
-
 import plotly.express as px
 
 df = pd.DataFrame({
-
-    "month": ["2026-01", "2026-02", "2026-03", "2026-04"],
-
-    "revenue": [120000, 135000, 128000, 150000]
-
+    "month": [
+        "2026-01",
+        "2026-02",
+        "2026-03",
+        "2026-04"
+    ],
+    "revenue": [
+        120000,
+        135000,
+        128000,
+        150000
+    ]
 })
-
 ```
 
 Vytvoř interaktivní line chart.
@@ -2056,7 +2248,6 @@ Vytvoř interaktivní line chart.
 Použij:
 
 ```text
-
 month
 
 → osa X
@@ -2064,85 +2255,56 @@ month
 revenue
 
 → osa Y
-
 ```
 
-Zobraz body pomocí `markers=True`.
-
-Přidej nadpis:
+Zobraz body a přidej nadpis:
 
 ```text
-
 Měsíční tržby
-
 ```
 
-**### Řešení**
+### Řešení
 
 ```python
-
 fig = px.line(
-
     df,
-
     x="month",
-
     y="revenue",
-
     markers=True,
-
     title="Měsíční tržby"
-
 )
 
 fig.show()
-
 ```
 
-**### Krátce**
+---
 
-```text
+## Test 2 — Bar chart
 
-px.line()
-
-→ interaktivní line chart
-
-markers=True
-
-→ zobrazí body
-
-fig.show()
-
-→ zobrazí graf
-
-```
-
-\---
-
-**## Test 2 — Bar chart**
-
-**### Zadání**
+### Zadání
 
 Máš DataFrame:
 
 ```python
-
 df = pd.DataFrame({
-
-    "segment": ["B2B", "B2C", "Partner"],
-
-    "revenue": [520000, 350000, 130000]
-
+    "segment": [
+        "B2B",
+        "B2C",
+        "Partner"
+    ],
+    "revenue": [
+        520000,
+        350000,
+        130000
+    ]
 })
-
 ```
 
-Vytvoř Plotly bar chart.
+Vytvoř interaktivní bar chart.
 
 Použij:
 
 ```text
-
 segment
 
 → osa X
@@ -2150,77 +2312,97 @@ segment
 revenue
 
 → osa Y
-
 ```
 
 Přidej nadpis:
 
 ```text
-
 Tržby podle segmentu
-
 ```
 
-**### Řešení**
+### Řešení
 
 ```python
-
 fig = px.bar(
-
     df,
-
     x="segment",
-
     y="revenue",
-
     title="Tržby podle segmentu"
-
 )
 
 fig.show()
-
 ```
 
-**### Krátce**
+---
 
-```text
+## Test 3 — Scatter plot
 
-px.bar()
-
-→ interaktivní sloupcový graf
-
-fig.show()
-
-→ zobrazí graf
-
-```
-
-\---
-
-**## Test 3 — Pie chart**
-
-**### Zadání**
+### Zadání
 
 Máš DataFrame:
 
 ```python
-
 df = pd.DataFrame({
-
-    "segment": ["B2B", "B2C", "Partner"],
-
-    "revenue": [520000, 350000, 130000]
-
+    "ad_spend": [10, 15, 20, 25, 30, 35],
+    "revenue": [80, 110, 150, 170, 210, 250]
 })
-
 ```
 
-Vytvoř Plotly pie chart.
+Vytvoř interaktivní scatter plot.
 
 Použij:
 
 ```text
+ad_spend
 
+→ osa X
+
+revenue
+
+→ osa Y
+```
+
+### Řešení
+
+```python
+fig = px.scatter(
+    df,
+    x="ad_spend",
+    y="revenue",
+    title="Vztah marketingových nákladů a tržeb"
+)
+
+fig.show()
+```
+
+---
+
+## Test 4 — Pie chart
+
+### Zadání
+
+Máš DataFrame:
+
+```python
+df = pd.DataFrame({
+    "segment": [
+        "B2B",
+        "B2C",
+        "Partner"
+    ],
+    "revenue": [
+        520000,
+        350000,
+        130000
+    ]
+})
+```
+
+Vytvoř interaktivní pie chart.
+
+Použij:
+
+```text
 segment
 
 → názvy výsečí
@@ -2228,77 +2410,58 @@ segment
 revenue
 
 → hodnoty
-
 ```
 
 Přidej nadpis:
 
 ```text
-
 Podíl tržeb podle segmentu
-
 ```
 
-**### Řešení**
+### Řešení
 
 ```python
-
 fig = px.pie(
-
     df,
-
     names="segment",
-
     values="revenue",
-
     title="Podíl tržeb podle segmentu"
-
 )
 
 fig.show()
-
 ```
 
-**### Krátce**
+---
 
-```text
+## Test 5 — Více line sérií
 
-px.pie()
-
-→ interaktivní koláčový graf
-
-names=
-
-→ kategorie
-
-values=
-
-→ hodnoty
-
-```
-
-\---
-
-**## Test 4 — Více line sérií**
-
-**### Zadání**
+### Zadání
 
 Máš DataFrame ve wide formátu:
 
 ```python
-
 df = pd.DataFrame({
-
-    "month": ["2026-01", "2026-02", "2026-03"],
-
-    "B2B": [120, 135, 150],
-
-    "B2C": [90, 95, 110],
-
-    "Partner": [40, 45, 50]
-
+    "month": [
+        "2026-01",
+        "2026-02",
+        "2026-03"
+    ],
+    "B2B": [
+        120,
+        135,
+        150
+    ],
+    "B2C": [
+        90,
+        95,
+        110
+    ],
+    "Partner": [
+        40,
+        45,
+        50
+    ]
 })
-
 ```
 
 Převeď data pomocí `melt()` do long formátu.
@@ -2306,13 +2469,11 @@ Převeď data pomocí `melt()` do long formátu.
 Výsledné sloupce:
 
 ```text
-
 month
 
 segment
 
 revenue
-
 ```
 
 Potom vytvoř Plotly line chart.
@@ -2320,7 +2481,6 @@ Potom vytvoř Plotly line chart.
 Použij:
 
 ```text
-
 month
 
 → osa X
@@ -2332,59 +2492,26 @@ revenue
 segment
 
 → jednotlivé série
-
 ```
 
 Zobraz body.
 
-**### Řešení**
+### Řešení
 
 ```python
-
 df_long = df.melt(
-
     id_vars="month",
-
     var_name="segment",
-
     value_name="revenue"
-
 )
 
 fig = px.line(
-
     df_long,
-
     x="month",
-
     y="revenue",
-
     color="segment",
-
     markers=True
-
 )
 
 fig.show()
-
 ```
-
-**### Krátce**
-
-```text
-
-melt()
-
-→ wide → long format
-
-color="segment"
-
-→ samostatná série pro každý segment
-
-Plotly legenda
-
-→ umožňuje série skrývat a zobrazovat
-
-```
-
-\---
