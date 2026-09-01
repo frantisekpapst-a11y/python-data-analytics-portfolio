@@ -3165,3 +3165,438 @@ Výstup Pythonu
 → Excelová hodnota
 ```
 
+---
+
+# Lekce 21 — Power BI + Python + DAX
+
+## Test 1 — Dynamické KPI
+
+### Zadání
+
+Máš Power BI report a chceš vytvořit KPI, které se má měnit podle sliceru `region`.
+
+Kam tento výpočet nejlépe patří?
+
+```text
+A) Power Query
+
+B) Python
+
+C) DAX
+
+D) Matplotlib
+```
+
+### Řešení
+
+```text
+C) DAX
+```
+
+```text
+KPI se má měnit podle sliceru
+
+→ potřebujeme dynamický výpočet
+
+→ DAX measure
+```
+
+---
+
+## Test 2 — Kdy se spouští Python v Power Query
+
+### Zadání
+
+Python v Power Query vytvoří sloupec:
+
+```python
+dataset["profit"] = (
+    dataset["revenue"]
+    - dataset["cost"]
+)
+```
+
+Kdy se tento Pythonový výpočet znovu provede?
+
+```text
+A) pokaždé, když klikneš na slicer
+
+B) při refreshi dat
+
+C) při každém zobrazení stránky reportu
+
+D) jen při prvním vytvoření reportu
+```
+
+### Řešení
+
+```text
+B) při refreshi dat
+```
+
+```text
+Power Query / Python
+→ běží při refreshi
+
+slicer
+→ Python znovu nespouští
+```
+
+---
+
+## Test 3 — Statická kategorizace
+
+### Zadání
+
+Chceš vytvořit kategorii:
+
+```text
+High
+
+Medium
+
+Low
+```
+
+podle `profit`.
+
+Kategorie se nemá měnit podle slicerů.
+
+Které řešení je nejpřirozenější?
+
+```text
+A) DAX measure
+
+B) Power Query nebo Python
+
+C) Power BI vizualizace
+
+D) Matplotlib
+```
+
+### Řešení
+
+```text
+B) Power Query nebo Python
+```
+
+```text
+statická kategorizace
+→ příprava dat
+
+→ Power Query / Python
+```
+
+---
+
+## Test 4 — DataFrame v Power Query
+
+### Zadání
+
+V Power Query spustíš Python skript.
+
+Jak se jmenuje DataFrame, který Power BI automaticky předá Pythonu?
+
+```text
+A) df
+
+B) table
+
+C) dataset
+
+D) source
+```
+
+### Řešení
+
+```text
+C) dataset
+```
+
+Python pracuje přímo s:
+
+```python
+dataset
+```
+
+Například:
+
+```python
+dataset["profit"] = (
+    dataset["revenue"]
+    - dataset["cost"]
+)
+```
+
+---
+
+## Test 5 — Kontrola po Python kroku
+
+### Zadání
+
+Po Python kroku se data vrátí zpět do Power Query.
+
+Co je dobré vždy zkontrolovat?
+
+```text
+A) jen názvy sloupců
+
+B) jen počet řádků
+
+C) datové typy
+
+D) jen pořadí sloupců
+```
+
+### Řešení
+
+```text
+C) datové typy
+```
+
+Praktický workflow:
+
+```text
+načíst data
+
+→ zkontrolovat datové typy
+
+→ Python krok
+
+→ znovu zkontrolovat datové typy
+```
+
+---
+
+## Test 6 — Total Profit podle sliceru
+
+### Zadání
+
+Chceš vytvořit `Total Profit`, který se má měnit podle sliceru `region`.
+
+Co je správně?
+
+```text
+A) calculated column
+
+B) DAX measure
+
+C) Python sloupec
+
+D) Power Query podmíněný sloupec
+```
+
+### Řešení
+
+```text
+B) DAX measure
+```
+
+Například:
+
+```DAX
+Total Profit =
+SUM(List1[profit])
+```
+
+```text
+measure
+→ reaguje na filter context
+
+calculated column
+→ hodnota na úrovni řádku
+```
+
+---
+
+## Test 7 — Preferovaný transformační nástroj
+
+### Zadání
+
+Chceš řešit:
+
+```text
+cleaning
+
+merge
+
+concat
+
+nové sloupce
+
+business logiku
+```
+
+a preferuješ co nejméně manuálních kroků.
+
+Který nástroj je vhodný jako hlavní transformační vrstva?
+
+```text
+A) Power Query
+
+B) Python / Pandas
+
+C) DAX
+
+D) Power BI vizuál
+```
+
+### Řešení
+
+```text
+B) Python / Pandas
+```
+
+```text
+Python / Pandas
+→ cleaning
+→ merge
+→ concat
+→ nové sloupce
+→ vlastní logika
+```
+
+Power Query může zůstat hlavně pro:
+
+```text
+načtení dat
++
+jednoduché přípravné kroky
+```
+
+---
+
+## Test 8 — Dynamika DAXu
+
+### Zadání
+
+Které tvrzení o DAXu je správné?
+
+```text
+A) DAX načítá nová data přímo ze zdroje
+
+B) DAX reaguje na slicery, ale počítá nad daty, která už jsou v modelu
+
+C) DAX nahrazuje Power Query
+
+D) DAX se spouští jen při refreshi
+```
+
+### Řešení
+
+```text
+B)
+```
+
+```text
+DAX
+→ reaguje na filtry a slicery
+
+ale
+
+→ počítá nad daty načtenými v modelu
+```
+
+```text
+dynamický DAX
+≠
+automaticky aktuální zdrojová data
+```
+
+---
+
+## Test 9 — Vizualizace pro management reporting
+
+### Zadání
+
+Chceš vytvořit běžný management dashboard:
+
+```text
+slicery
+
+KPI karty
+
+grafy
+
+drill-down
+
+cross-filtering
+```
+
+Co je nejlepší pro vizualizaci?
+
+```text
+A) Matplotlib
+
+B) Plotly v Pythonu
+
+C) nativní Power BI vizuály
+
+D) NumPy
+```
+
+### Řešení
+
+```text
+C) nativní Power BI vizuály
+```
+
+```text
+Power BI
+→ slicery
+→ drill-down
+→ cross-filtering
+→ interaktivita
+→ management reporting
+```
+
+Python je zde praktičtější hlavně pro přípravu dat než pro samotný dashboard.
+
+---
+
+## Test 10 — Předání dat z Power Query do Pythonu
+
+### Zadání
+
+Máš data v Power Query a chceš je zpracovat Pythonem.
+
+Co platí?
+
+```text
+A) Python si je musí znovu načíst přes pd.read_csv()
+
+B) Power Query je předá jako DataFrame dataset
+
+C) musíš použít xl()
+
+D) nejdřív je musíš exportovat do Excelu
+```
+
+### Řešení
+
+```text
+B) Power Query je předá jako DataFrame dataset
+```
+
+Princip:
+
+```text
+Power Query
+
+→ Python Script
+
+→ dataset
+
+→ Python transformace
+
+→ zpět do Power Query
+```
+
+Není potřeba:
+
+```python
+pd.read_csv(...)
+xl(...)
+```
+
+protože data už Pythonu předal Power Query.
