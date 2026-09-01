@@ -1,6 +1,6 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 19
+# Rychlý přehled Lekcí 6 až 20
 
 ```text
 
@@ -59,6 +59,10 @@ Lekce 18
 Lekce 19
 
 → Plotly, interaktivní line, bar, scatter a pie chart, hover, legenda, více sérií, melt() a long formát
+
+Lekce 20
+
+→ Excel / Power Query vs. Pandas, Python in Excel, merge(), pd.concat(), Merge / Append, wide vs. long format, melt(), pivot(), xl()
 
 ```
 
@@ -2515,3 +2519,649 @@ fig = px.line(
 
 fig.show()
 ```
+
+# Lekce 20 — Excel / Power Query vs. Pandas
+
+## Test 1 — Výběr vhodného nástroje
+
+### Zadání
+
+Máš malý dataset v Excelu.
+
+Potřebuješ jednorázově:
+
+```text
+vytvořit nový sloupec total
+
+→ quantity * unit_price
+
+spočítat tržby podle produktu
+
+seřadit výsledek sestupně
+```
+
+Co je v tomto případě nejpraktičtější?
+
+```text
+A) Excel
+
+B) Power Query
+
+C) Pandas
+```
+
+### Řešení
+
+```text
+A) Excel
+```
+
+```text
+malý dataset
++
+jednoduchý výpočet
++
+jednorázová analýza
+
+→ Excel
+```
+
+---
+
+## Test 2 — Opakovaný workflow
+
+### Zadání
+
+Každý měsíc dostaneš nový export se stejnou strukturou.
+
+Potřebuješ pokaždé:
+
+```text
+načíst data
+
+změnit datové typy
+
+odstranit nepotřebné sloupce
+
+spojit data s druhou tabulkou
+
+aktualizovat výsledek
+```
+
+Co je vhodnější?
+
+```text
+A) ruční Excel
+
+B) Power Query
+
+C) ruční kopírování dat
+```
+
+### Řešení
+
+```text
+B) Power Query
+```
+
+Power Query umožňuje transformační kroky nastavit jednou a potom použít:
+
+```text
+Data
+
+→ Aktualizovat vše
+```
+
+---
+
+## Test 3 — `merge()` vs. `concat()`
+
+### Zadání
+
+Máš dvě tabulky:
+
+```text
+orders
+
+order_id
+customer_id
+revenue
+```
+
+a:
+
+```text
+customers
+
+customer_id
+customer_name
+region
+```
+
+Chceš k objednávkám doplnit:
+
+```text
+customer_name
+
+region
+```
+
+Co použiješ v Pandas?
+
+```text
+A) pd.concat()
+
+B) merge()
+```
+
+### Řešení
+
+```text
+B) merge()
+```
+
+```python
+result = orders.merge(
+    customers,
+    on="customer_id",
+    how="left"
+)
+```
+
+---
+
+## Test 4 — `pd.concat()`
+
+### Zadání
+
+Máš dvě tabulky se stejnou strukturou:
+
+```text
+orders_january
+
+order_id
+customer_id
+revenue
+```
+
+a:
+
+```text
+orders_february
+
+order_id
+customer_id
+revenue
+```
+
+Chceš únorová data přidat pod lednová.
+
+Co použiješ?
+
+### Řešení
+
+```python
+result = pd.concat(
+    [
+        orders_january,
+        orders_february
+    ],
+    ignore_index=True
+)
+```
+
+---
+
+## Test 5 — `ignore_index=True`
+
+### Zadání
+
+Máš dva DataFrame:
+
+```python
+orders_1 = pd.DataFrame({
+    "order_id": [1, 2],
+    "revenue": [12000, 8000]
+})
+
+orders_2 = pd.DataFrame({
+    "order_id": [3, 4],
+    "revenue": [15000, 7000]
+})
+```
+
+Spojíš je:
+
+```python
+result = pd.concat(
+    [
+        orders_1,
+        orders_2
+    ],
+    ignore_index=True
+)
+```
+
+Co udělá:
+
+```python
+ignore_index=True
+```
+
+### Řešení
+
+```text
+vytvoří nový souvislý index
+```
+
+Výsledek:
+
+```text
+0
+1
+2
+3
+```
+
+Bez `ignore_index=True` by se mohly zachovat původní indexy:
+
+```text
+0
+1
+0
+1
+```
+
+---
+
+## Test 6 — `loc` vs. `iloc`
+
+### Zadání
+
+Jaký je rozdíl mezi:
+
+```python
+df.loc[0]
+```
+
+a:
+
+```python
+df.iloc[0]
+```
+
+### Řešení
+
+```text
+loc
+
+→ pracuje podle labelu / hodnoty indexu
+
+iloc
+
+→ pracuje podle číselné pozice
+```
+
+```python
+df.loc[0]
+```
+
+→ řádek s indexem `0`
+
+```python
+df.iloc[0]
+```
+
+→ první řádek v pořadí
+
+---
+
+## Test 7 — Wide format
+
+### Zadání
+
+Máš tabulku:
+
+```text
+month     B2B   B2C   Partner
+
+2026-01   120    90      40
+2026-02   135    95      45
+```
+
+Je to:
+
+```text
+A) wide format
+
+B) long format
+```
+
+### Řešení
+
+```text
+A) wide format
+```
+
+Kategorie:
+
+```text
+B2B
+B2C
+Partner
+```
+
+jsou uložené jako samostatné sloupce.
+
+---
+
+## Test 8 — Wide → Long pomocí `melt()`
+
+### Zadání
+
+Máš:
+
+```python
+df = pd.DataFrame({
+    "month": [
+        "2026-01",
+        "2026-02"
+    ],
+    "B2B": [
+        120,
+        135
+    ],
+    "B2C": [
+        90,
+        95
+    ],
+    "Partner": [
+        40,
+        45
+    ]
+})
+```
+
+Převeď DataFrame do long formátu:
+
+```text
+month
+segment
+revenue
+```
+
+### Řešení
+
+```python
+df_long = df.melt(
+    id_vars="month",
+    var_name="segment",
+    value_name="revenue"
+)
+```
+
+---
+
+## Test 9 — Long → Wide pomocí `pivot()`
+
+### Zadání
+
+Máš DataFrame ve formátu:
+
+```text
+month     segment   revenue
+
+2026-01   B2B       120
+2026-01   B2C        90
+2026-01   Partner    40
+2026-02   B2B       135
+2026-02   B2C        95
+2026-02   Partner    45
+```
+
+Převeď ho zpět do wide formátu.
+
+### Řešení
+
+```python
+df_wide = df_long.pivot(
+    index="month",
+    columns="segment",
+    values="revenue"
+).reset_index()
+```
+
+---
+
+## Test 10 — Power Query: Wide → Long
+
+### Zadání
+
+Jaká Power Query operace odpovídá Pandas:
+
+```python
+df.melt(...)
+```
+
+### Řešení
+
+```text
+Převést sloupce na řádky
+
+→ Unpivot
+```
+
+---
+
+## Test 11 — Power Query: Long → Wide
+
+### Zadání
+
+Jaká Power Query operace odpovídá Pandas:
+
+```python
+df.pivot(...)
+```
+
+### Řešení
+
+```text
+Kontingenční sloupec
+
+→ Pivot
+```
+
+---
+
+## Test 12 — Power Query Merge
+
+### Zadání
+
+Máš:
+
+```text
+orders
+
+customer_id
+revenue
+```
+
+a:
+
+```text
+customers
+
+customer_id
+customer_name
+region
+```
+
+Chceš zachovat všechny řádky z `orders` a doplnit odpovídající data z `customers`.
+
+Jaký typ spojení použiješ v Power Query?
+
+### Řešení
+
+```text
+Sloučit dotazy
+
+→ Levé vnější
+```
+
+Pandas ekvivalent:
+
+```python
+orders.merge(
+    customers,
+    on="customer_id",
+    how="left"
+)
+```
+
+---
+
+## Test 13 — Power Query Append
+
+### Zadání
+
+Máš:
+
+```text
+orders_1
+
+order_id
+customer_id
+revenue
+```
+
+a:
+
+```text
+orders_2
+
+order_id
+customer_id
+revenue
+```
+
+Chceš druhou tabulku přidat pod první.
+
+Jakou operaci použiješ v Power Query?
+
+### Řešení
+
+```text
+Připojit dotazy
+
+→ Append
+```
+
+Pandas ekvivalent:
+
+```python
+pd.concat(
+    [
+        orders_1,
+        orders_2
+    ],
+    ignore_index=True
+)
+```
+
+---
+
+## Test 14 — Python in Excel
+
+### Zadání
+
+Načti do Pythonu oblast:
+
+```text
+A1:D10
+```
+
+První řádek obsahuje názvy sloupců.
+
+### Řešení
+
+```python
+df = xl(
+    "A1:D10",
+    headers=True
+)
+```
+
+---
+
+## Test 15 — Python in Excel a Pandas
+
+### Zadání
+
+Máš v Excelu data:
+
+```text
+region
+product
+quantity
+unit_price
+```
+
+Načti je pomocí `xl()`.
+
+Potom:
+
+1. převeď `quantity` a `unit_price` na `int`,
+2. vytvoř `total`,
+3. spočítej tržby podle produktu,
+4. seřaď je sestupně.
+
+### Řešení
+
+```python
+df = xl(
+    "A1:D6",
+    headers=True
+)
+
+df["quantity"] = df["quantity"].astype(int)
+
+df["unit_price"] = df["unit_price"].astype(int)
+
+df["total"] = (
+    df["quantity"]
+    * df["unit_price"]
+)
+
+revenue_by_product = (
+    df.groupby(
+        "product",
+        as_index=False
+    )["total"]
+    .sum()
+    .sort_values(
+        by="total",
+        ascending=False
+    )
+)
+
+revenue_by_product
+```
+
+---
+
+## Test 16 — Python in Excel výstup
+
+### Zadání
+
+Python in Excel vrátí `DataFrame`.
+
+Jak výsledek zobrazíš přímo v buňkách Excelu?
+
+### Řešení
+
+```text
+Výstup Pythonu
+
+→ Excelová hodnota
+```
+
