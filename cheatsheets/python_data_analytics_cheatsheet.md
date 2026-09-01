@@ -3305,3 +3305,404 @@ xl()
 ```
 
 Samotná práce s DataFrame je potom prakticky stejná.
+
+---
+
+# 54. Power BI + Python + DAX
+
+## Varianta 1 — Power Query jako hlavní transformační vrstva
+
+```text
+Power Query
+→ běžné čištění
+→ transformace
+→ merge
+→ append
+→ hlavní příprava dat
+
+Python
+→ složitější logika
+→ API
+→ nestandardní zdroje
+→ statistika
+→ preprocessing
+→ běží při refreshi
+
+DAX
+→ dynamické výpočty
+→ measures
+→ KPI
+→ trendy
+→ % podíly
+→ rolling metriky
+→ reaguje na filtry a slicery
+
+Power BI
+→ vizualizace
+→ interaktivita
+→ reporting
+```
+
+---
+
+## Varianta 2 — Python jako hlavní transformační vrstva
+
+```text
+Power Query
+→ načtení dat
+→ kontrola datových typů
+→ jednoduché úpravy
+→ minimum kroků před Pythonem
+
+Python
+→ hlavní cleaning
+→ transformace
+→ merge
+→ concat
+→ nové sloupce
+→ kategorizace
+→ business logika
+→ API
+→ preprocessing
+→ běží při refreshi
+
+DAX
+→ dynamické metriky
+→ KPI
+→ measures
+→ trendy
+→ reaguje na slicery
+
+Power BI
+→ dashboard
+→ slicery
+→ interaktivita
+→ reporting
+```
+
+Rozdíl:
+
+```text
+Varianta 1
+→ Power Query hlavně zpracovává data
+
+Varianta 2
+→ Python hlavně zpracovává data
+```
+
+---
+
+## Python v Power Query
+
+Power Query předá aktuální tabulku Pythonu jako DataFrame:
+
+```text
+Power Query
+→ Python Script
+→ dataset
+→ Python úpravy
+→ zpět do Power Query
+```
+
+Python pracuje s:
+
+```python
+dataset
+```
+
+Příklad:
+
+```python
+dataset["profit"] = (
+    dataset["revenue"]
+    - dataset["cost"]
+)
+```
+
+Není potřeba:
+
+```python
+pd.read_csv(...)
+xl(...)
+```
+
+protože data už předal Power Query.
+
+---
+
+## Python + NumPy kategorizace
+
+```python
+import numpy as np
+
+dataset["performance"] = np.select(
+    [
+        dataset["profit"] >= 35000,
+        dataset["profit"] >= 30000
+    ],
+    [
+        "High",
+        "Medium"
+    ],
+    default="Low"
+)
+```
+
+```text
+>= 35000
+→ High
+
+>= 30000
+→ Medium
+
+jinak
+→ Low
+```
+
+Pořadí podmínek je důležité.
+
+---
+
+## Datové typy po Python kroku
+
+Po návratu z Pythonu:
+
+```text
+→ znovu zkontrolovat datové typy
+```
+
+Praktický workflow:
+
+```text
+načíst data
+→ zkontrolovat typy
+→ Python
+→ zkontrolovat typy znovu
+```
+
+---
+
+## Power Query vs. Python vs. DAX
+
+Stejný úkol lze často řešit více způsoby.
+
+Například kategorizace:
+
+```text
+Power Query
+→ podmíněný sloupec
+
+Python
+→ np.select()
+
+DAX
+→ calculated column
+```
+
+Praktické pravidlo:
+
+```text
+statická příprava dat
+→ Power Query / Python
+
+složitější logika
+→ Python
+
+dynamický výpočet v reportu
+→ DAX
+```
+
+---
+
+## DAX — calculated column vs. measure
+
+Calculated column:
+
+```text
+→ hodnota pro každý řádek
+→ uloží se do modelu
+→ vhodné pro kategorizaci
+```
+
+Measure:
+
+```text
+→ agregovaný výsledek
+→ reaguje na filter context
+→ vhodné pro KPI
+```
+
+Příklady:
+
+```DAX
+Total Revenue =
+SUM(List1[revenue])
+```
+
+```DAX
+Total Profit =
+SUM(List1[profit])
+```
+
+```DAX
+Average Profit =
+AVERAGE(List1[profit])
+```
+
+---
+
+## DAX kategorizace
+
+```DAX
+performance_dax =
+IF(
+    List1[profit] >= 35000;
+    "High";
+    IF(
+        List1[profit] >= 30000;
+        "Medium";
+        "Low"
+    )
+)
+```
+
+Pozor:
+
+```text
+DAX může podle regionálního nastavení používat:
+
+,
+nebo
+;
+
+jako oddělovač argumentů
+```
+
+---
+
+## Refresh vs. dynamika
+
+Power Query / Python:
+
+```text
+→ běží při refreshi
+```
+
+DAX:
+
+```text
+→ reaguje na filtry a slicery
+→ počítá nad daty v modelu
+```
+
+Důležité:
+
+```text
+DAX je dynamický vůči výběru
+
+ale
+
+data mezi refreshi zůstávají stejná
+```
+
+---
+
+## Python vizualizace v Power BI
+
+Python vizuály existují, ale pro běžný reporting je praktičtější:
+
+```text
+Power BI native visuals
+```
+
+kvůli:
+
+```text
+slicerům
+cross-filteringu
+drill-downu
+interaktivitě
+dashboardům
+```
+
+Prakticky:
+
+```text
+Python
+→ data a logika
+
+Power BI
+→ vizualizace a reporting
+```
+
+---
+
+## Kdy Python v Power BI dává smysl
+
+```text
+API
+nestandardní zdroje
+složitější transformace
+vlastní business logika
+statistika
+preprocessing
+automatizace
+```
+
+Jednoduché věci mohou zůstat v Power Query:
+
+```text
+změna typu
+odstranění sloupce
+jednoduchý filtr
+```
+
+---
+
+## Preferovaný workflow
+
+```text
+zdroj dat
+
+→ SQL
+   pokud data leží v databázi / warehouse
+
+→ Power Query
+   načtení + jednoduché přípravné kroky
+
+→ Python / Pandas
+   cleaning
+   transformace
+   merge
+   concat
+   business logika
+   API
+
+→ Power BI model
+
+→ DAX
+   KPI
+   measures
+   dynamické výpočty
+
+→ Power BI
+   dashboard
+   slicery
+   interaktivita
+```
+
+Zjednodušeně:
+
+```text
+SQL
+→ dostaň správná data
+
+Python
+→ zpracuj je
+
+DAX
+→ počítej dynamické metriky
+
+Power BI
+→ zobraz je
+```
