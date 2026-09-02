@@ -3706,3 +3706,256 @@ DAX
 Power BI
 → zobraz je
 ```
+
+---
+
+# 55. SQL + Python
+
+## Základní workflow
+
+```text
+databáze
+→ SQL
+→ pd.read_sql()
+→ Pandas DataFrame
+→ další transformace / analýza
+```
+
+Prakticky:
+
+```text
+SQL
+→ vyber správná data
+
+Python
+→ zpracuj je
+```
+
+---
+
+## SQLite connection
+
+```python
+import sqlite3
+import pandas as pd
+
+connection = sqlite3.connect("sales.db")
+```
+
+```text
+connection
+→ spojení Pythonu s databází
+```
+
+---
+
+## Načtení SQL dotazu do Pandas
+
+```python
+query = """
+SELECT
+    order_id,
+    product,
+    quantity,
+    unit_price
+FROM orders
+WHERE quantity >= 2
+"""
+
+df = pd.read_sql(
+    query,
+    connection
+)
+```
+
+```text
+SQL query
+→ databáze dotaz provede
+→ vrátí výsledek
+→ pd.read_sql() vytvoří DataFrame
+```
+
+---
+
+## SELECT databázi nemění
+
+```sql
+SELECT *
+FROM orders;
+```
+
+```text
+SELECT
+→ pouze čte data
+```
+
+Databázi mění například:
+
+```text
+INSERT
+UPDATE
+DELETE
+CREATE
+ALTER
+DROP
+```
+
+---
+
+## JOIN před Pandas
+
+```python
+query = """
+SELECT
+    o.order_id,
+    o.product,
+    o.quantity,
+    o.unit_price,
+    c.customer_name,
+    c.region
+FROM orders o
+JOIN customers c
+    ON o.customer_id = c.customer_id
+"""
+
+df = pd.read_sql(
+    query,
+    connection
+)
+```
+
+```text
+SQL
+→ spojí tabulky
+
+Pandas
+→ dostane připravený detailní dataset
+```
+
+---
+
+## Granularita
+
+```text
+granularita
+→ úroveň detailu dat
+```
+
+Například:
+
+```text
+1 řádek = 1 objednávka
+```
+
+Praktické pravidlo:
+
+```text
+detailní data
+→ zachovat co nejdéle
+
+agregace
+→ až podle analytické potřeby
+```
+
+---
+
+## Transformace v Pandas
+
+```python
+df["total"] = (
+    df["quantity"]
+    * df["unit_price"]
+)
+```
+
+Agregace:
+
+```python
+region_summary = (
+    df.groupby("region")["total"]
+    .sum()
+    .reset_index()
+    .sort_values(
+        "total",
+        ascending=False
+    )
+)
+```
+
+---
+
+## Parametrizovaný SQL dotaz
+
+```python
+region = "Praha"
+
+query = """
+SELECT *
+FROM customers
+WHERE region = ?
+"""
+
+df_region = pd.read_sql(
+    query,
+    connection,
+    params=(region,)
+)
+```
+
+```text
+?
+→ placeholder
+
+params=
+→ hodnoty předané databázi
+```
+
+Jednoprvkový tuple:
+
+```python
+("Praha",)
+```
+
+---
+
+## Zavření connection
+
+```python
+connection.close()
+```
+
+```text
+connect()
+→ otevřít spojení
+
+read_sql()
+→ použít spojení
+
+close()
+→ zavřít spojení
+```
+
+---
+
+## Hlavní mentální model
+
+```text
+SQL
+→ SELECT
+→ WHERE
+→ JOIN
+
+Python / Pandas
+→ cleaning
+→ nové sloupce
+→ groupby
+→ agregace
+→ analýza
+```
+
+Hlavní pravidlo:
+
+```text
+agregovat co nejpozději,
+ale ne později, než dává smysl výkonově
+```
