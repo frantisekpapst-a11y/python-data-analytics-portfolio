@@ -1,69 +1,58 @@
 # Python for Data Analytics — minitesty
 
-# Rychlý přehled Lekcí 6 až 20
+## Rychlý přehled Lekcí 6 až 22
 
 ```text
-
 Lekce 6
-
 → Pandas základy
 
 Lekce 7
-
 → filtrování, loc, iloc
 
 Lekce 8
-
 → missing values
 
 Lekce 9
-
 → cleaning a validation
 
 Lekce 10
-
 → CSV, JSON, SQL, API
 
 Lekce 11
-
 → groupby(), agg(), GROUP BY, HAVING
 
 Lekce 12
-
 → merge(), JOIN, validate, suffixes
 
 Lekce 13
-
 → datetime, dt, strftime(), filtrování podle data
 
 Lekce 14
-
 → práce s textem, .str, strip(), title(), lower(), upper(), contains(), startswith(), endswith(), replace(), split(), len()
 
 Lekce 15
-
 → EDA, describe(), value_counts(), groupby(), IQR, outliers, corr(), histogram
 
 Lekce 16
-
 → SDA, H0, H1, p-value, Pearson, t-test, chi-square, ANOVA, Mann-Whitney U, Shapiro-Wilk
 
 Lekce 17
-
-→ NumPy pro datovou analytiku, np.where(), np.select(), np.nan, array, dtype, axis, propojení NumPy a Pandas
+→ NumPy pro datovou analytiku, array, dtype, axis, np.where(), np.select(), np.nan, propojení NumPy a Pandas
 
 Lekce 18
-
 → Matplotlib, Pandas plotting, line, bar, scatter, histogram, boxplot, pie, základní formátování grafů
 
 Lekce 19
-
 → Plotly, interaktivní line, bar, scatter a pie chart, hover, legenda, více sérií, melt() a long formát
 
 Lekce 20
+→ Excel / Power Query vs. Pandas, Python in Excel, xl(), merge(), pd.concat(), Merge / Append, wide vs. long format, melt(), pivot()
 
-→ Excel / Power Query vs. Pandas, Python in Excel, merge(), pd.concat(), Merge / Append, wide vs. long format, melt(), pivot(), xl()
+Lekce 21
+→ Power BI + Python + DAX, Python v Power Query, dataset, NumPy kategorizace, calculated column vs. measure, slicery, refresh, dynamické KPI
 
+Lekce 22
+→ SQL + Python, SQLite, connection, SELECT, WHERE, JOIN, pd.read_sql(), parametrizované dotazy, Pandas transformace, connection.close()
 ```
 
 ---
@@ -3600,3 +3589,255 @@ xl(...)
 ```
 
 protože data už Pythonu předal Power Query.
+
+---
+
+# Lekce 22 — SQL + Python
+
+## Test 1 — Načtení SQL dotazu do Pandas
+
+### Zadání
+
+Co dělá tento kód?
+
+```python
+df = pd.read_sql(query, connection)
+```
+
+```text
+A) uloží DataFrame do databáze
+
+B) spustí SQL dotaz přes dané připojení a výsledek načte do Pandas DataFrame
+
+C) vytvoří novou SQLite databázi
+
+D) zavře spojení s databází
+```
+
+### Řešení
+
+```text
+B) spustí SQL dotaz přes dané připojení a výsledek načte do Pandas DataFrame
+```
+
+```text
+pd.read_sql()
+
+→ pošle SQL dotaz přes connection
+
+→ databáze dotaz provede
+
+→ výsledek se načte do Pandas DataFrame
+```
+
+---
+
+## Test 2 — Connection
+
+### Zadání
+
+Co je hlavní role objektu `connection`?
+
+```text
+A) ukládá DataFrame
+
+B) určuje, ke které databázi se Python připojuje
+
+C) vytváří graf
+
+D) nahrazuje SQL dotaz
+```
+
+### Řešení
+
+```text
+B) určuje, ke které databázi se Python připojuje
+```
+
+```text
+query
+→ říká, co chceme z databáze
+
+connection
+→ říká, ve které databázi se má dotaz provést
+```
+
+---
+
+## Test 3 — SELECT + WHERE
+
+### Zadání
+
+Co udělá tento SQL dotaz?
+
+```sql
+SELECT
+    order_id,
+    product
+FROM orders
+WHERE quantity >= 2;
+```
+
+```text
+A) změní data v tabulce orders
+
+B) smaže řádky s quantity < 2
+
+C) vrátí jen vybrané sloupce a řádky splňující podmínku
+
+D) vytvoří nový DataFrame
+```
+
+### Řešení
+
+```text
+C) vrátí jen vybrané sloupce a řádky splňující podmínku
+```
+
+```text
+SELECT
+→ vybírá sloupce
+
+WHERE
+→ filtruje řádky
+
+SELECT data pouze čte
+→ databázi nemění
+```
+
+---
+
+## Test 4 — JOIN
+
+### Zadání
+
+Co udělá tento SQL dotaz?
+
+```sql
+SELECT
+    o.order_id,
+    c.customer_name
+FROM orders o
+JOIN customers c
+    ON o.customer_id = c.customer_id;
+```
+
+```text
+A) spojí objednávky se zákazníky podle customer_id
+
+B) agreguje objednávky podle zákazníka
+
+C) smaže zákazníky bez objednávky
+
+D) vytvoří nový sloupec v Pandas
+```
+
+### Řešení
+
+```text
+A) spojí objednávky se zákazníky podle customer_id
+```
+
+```text
+orders
++
+customers
+
+→ JOIN podle customer_id
+
+→ objednávky se obohatí o údaje o zákazníkovi
+
+→ granularita objednávky může zůstat zachovaná
+```
+
+---
+
+## Test 5 — Parametrizovaný SQL dotaz
+
+### Zadání
+
+Proč je lepší použít parametrizovaný dotaz:
+
+```python
+query = """
+SELECT *
+FROM customers
+WHERE region = ?
+"""
+```
+
+spolu s:
+
+```python
+params=(region,)
+```
+
+místo ručního skládání SQL přes text?
+
+```text
+A) protože je bezpečnější a čistší
+
+B) protože automaticky vytvoří graf
+
+C) protože uloží výsledek do CSV
+
+D) protože zavře databázi
+```
+
+### Řešení
+
+```text
+A) protože je bezpečnější a čistší
+```
+
+```text
+?
+→ placeholder pro hodnotu
+
+params=(region,)
+→ Python předá hodnotu databázi bezpečně
+
+výhoda
+→ nemusíme ručně skládat SQL řetězec
+```
+
+---
+
+## Test 6 — Zavření connection
+
+### Zadání
+
+Co udělá:
+
+```python
+connection.close()
+```
+
+```text
+A) smaže databázi
+
+B) zavře spojení Pythonu s databází
+
+C) uloží DataFrame do SQLite
+
+D) zavře VS Code
+```
+
+### Řešení
+
+```text
+B) zavře spojení Pythonu s databází
+```
+
+```text
+sqlite3.connect(...)
+→ otevře spojení
+
+pd.read_sql(...)
+→ používá spojení
+
+connection.close()
+→ spojení zavře
+```
+
+---
