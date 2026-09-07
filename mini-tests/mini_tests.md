@@ -1,58 +1,79 @@
 # Python for Data Analytics — minitesty
 
-## Rychlý přehled Lekcí 6 až 22
+## Rychlý přehled Lekcí 6 až 23
 
 ```text
 Lekce 6
+
 → Pandas základy
 
 Lekce 7
+
 → filtrování, loc, iloc
 
 Lekce 8
+
 → missing values
 
 Lekce 9
+
 → cleaning a validation
 
 Lekce 10
+
 → CSV, JSON, SQL, API
 
 Lekce 11
+
 → groupby(), agg(), GROUP BY, HAVING
 
 Lekce 12
+
 → merge(), JOIN, validate, suffixes
 
 Lekce 13
+
 → datetime, dt, strftime(), filtrování podle data
 
 Lekce 14
+
 → práce s textem, .str, strip(), title(), lower(), upper(), contains(), startswith(), endswith(), replace(), split(), len()
 
 Lekce 15
+
 → EDA, describe(), value_counts(), groupby(), IQR, outliers, corr(), histogram
 
 Lekce 16
+
 → SDA, H0, H1, p-value, Pearson, t-test, chi-square, ANOVA, Mann-Whitney U, Shapiro-Wilk
 
 Lekce 17
+
 → NumPy pro datovou analytiku, array, dtype, axis, np.where(), np.select(), np.nan, propojení NumPy a Pandas
 
 Lekce 18
+
 → Matplotlib, Pandas plotting, line, bar, scatter, histogram, boxplot, pie, základní formátování grafů
 
 Lekce 19
+
 → Plotly, interaktivní line, bar, scatter a pie chart, hover, legenda, více sérií, melt() a long formát
 
 Lekce 20
+
 → Excel / Power Query vs. Pandas, Python in Excel, xl(), merge(), pd.concat(), Merge / Append, wide vs. long format, melt(), pivot()
 
 Lekce 21
+
 → Power BI + Python + DAX, Python v Power Query, dataset, NumPy kategorizace, calculated column vs. measure, slicery, refresh, dynamické KPI
 
 Lekce 22
+
 → SQL + Python, SQLite, connection, SELECT, WHERE, JOIN, pd.read_sql(), parametrizované dotazy, Pandas transformace, connection.close()
+
+Lekce 23
+
+→ API v praxi, requests.get(), response, JSON, params, headers, status codes, raise_for_status(), timeout, try/except, pagination, append() vs. extend(), pd.json_normalize(), Open-Meteo, API → DataFrame → validace → analýza → export
 ```
 
 ---
@@ -3841,3 +3862,253 @@ connection.close()
 ```
 
 ---
+
+# Lekce 23 — API v praxi pro datového analytika
+
+## Test 1 — `requests.get()`
+
+### Zadání
+
+Co vrátí?
+
+```python
+response = requests.get(url)
+```
+
+```text
+A) JSON data
+B) objekt HTTP odpovědi
+C) DataFrame
+D) status code
+```
+
+### Řešení
+
+```text
+B) objekt HTTP odpovědi
+```
+
+---
+
+## Test 2 — `response.json()`
+
+### Zadání
+
+Jaký je rozdíl?
+
+```python
+response.json
+response.json()
+```
+
+```text
+A) žádný
+B) první je DataFrame
+C) první je odkaz na metodu, druhé ji spustí
+D) první vrací status code
+```
+
+### Řešení
+
+```text
+C) první je odkaz na metodu, druhé ji spustí
+```
+
+---
+
+## Test 3 — `params=`
+
+### Zadání
+
+K čemu slouží `params=`?
+
+```text
+A) timeout
+B) parametry dotazu do URL
+C) převod JSON na DataFrame
+D) status code
+```
+
+### Řešení
+
+```text
+B) parametry dotazu do URL
+```
+
+---
+
+## Test 4 — `headers=`
+
+### Zadání
+
+K čemu slouží `headers=`?
+
+```text
+A) doplňující informace o requestu
+B) počet řádků
+C) převod JSON
+D) pagination
+```
+
+### Řešení
+
+```text
+A) doplňující informace o requestu
+```
+
+---
+
+## Test 5 — `raise_for_status()`
+
+### Zadání
+
+Co udělá?
+
+```python
+response.raise_for_status()
+```
+
+```text
+A) převede JSON
+B) při HTTP chybě vyhodí výjimku
+C) zopakuje request
+D) vrátí status code
+```
+
+### Řešení
+
+```text
+B) při HTTP chybě vyhodí výjimku
+```
+
+---
+
+## Test 6 — `timeout=`
+
+### Zadání
+
+Proč používáme:
+
+```python
+timeout=10
+```
+
+```text
+A) převod na JSON
+B) opakování requestu
+C) omezení čekání na odpověď
+D) limit 10 záznamů
+```
+
+### Řešení
+
+```text
+C) omezení čekání na odpověď
+```
+
+---
+
+## Test 7 — `append()` vs. `extend()`
+
+### Zadání
+
+Proč je při pagination vhodnější:
+
+```python
+all_rows.extend(data)
+```
+
+než:
+
+```python
+all_rows.append(data)
+```
+
+```text
+A) extend() přidá jednotlivé prvky
+B) extend() odstraní duplicity
+C) append() funguje jen s čísly
+D) není rozdíl
+```
+
+### Řešení
+
+```text
+A) extend() přidá jednotlivé prvky
+```
+
+---
+
+## Test 8 — `json_normalize()`
+
+### Zadání
+
+Kdy použít:
+
+```python
+pd.json_normalize(data)
+```
+
+```text
+A) při nested JSON
+B) při řazení
+C) při status code 200
+D) při exportu do Excelu
+```
+
+### Řešení
+
+```text
+A) při nested JSON
+```
+
+---
+
+## Test 9 — `idxmax()`
+
+### Zadání
+
+Co vrátí?
+
+```python
+df["temperature_2m"].idxmax()
+```
+
+```text
+A) maximální hodnotu
+B) index řádku s maximální hodnotou
+C) celý řádek
+D) průměr
+```
+
+### Řešení
+
+```text
+B) index řádku s maximální hodnotou
+```
+
+---
+
+## Test 10 — Pagination
+
+### Zadání
+
+Co znamená?
+
+```python
+if not data:
+    break
+```
+
+```text
+A) ukonči cyklus při prázdné stránce
+B) odstraň duplicity
+C) vytvoř DataFrame
+D) přeskoč první stránku
+```
+
+### Řešení
+
+```text
+A) ukonči cyklus při prázdné stránce
+```
