@@ -3959,3 +3959,625 @@ Hlavní pravidlo:
 agregovat co nejpozději,
 ale ne později, než dává smysl výkonově
 ```
+
+---
+
+# 56. API v praxi pro datového analytika
+
+## Základní workflow
+
+```text
+API endpoint
+→ requests.get()
+→ status / headers
+→ response.json()
+→ Python list / dict
+→ DataFrame
+→ validation
+→ analysis
+→ visualization
+→ export
+```
+
+---
+
+## GET request
+
+```python
+import requests
+
+url = "https://jsonplaceholder.typicode.com/users"
+
+response = requests.get(
+    url,
+    timeout=10
+)
+```
+
+Kontrola:
+
+```python
+print(response.status_code)
+print(response.headers["Content-Type"])
+```
+
+```text
+200
+→ request proběhl úspěšně
+
+Content-Type
+→ formát odpovědi
+```
+
+API nemusí vracet pouze JSON.
+
+Možné formáty:
+
+```text
+JSON
+XML
+CSV
+text
+HTML
+binární data
+```
+
+---
+
+## JSON odpověď
+
+```python
+data = response.json()
+```
+
+Kontrola struktury:
+
+```python
+print(type(data))
+print(data.keys())   # pokud je data dict
+```
+
+```text
+response.json
+→ odkaz na metodu
+
+response.json()
+→ skutečně zavolá metodu a vrátí data
+```
+
+---
+
+## List + dict vs. DataFrame
+
+Příklad JSON:
+
+```python
+data[0]["name"]
+```
+
+```text
+data[0]
+→ první prvek listu
+
+["name"]
+→ klíč ve slovníku
+```
+
+Po převodu do Pandas:
+
+```python
+df = pd.DataFrame(data)
+
+df.loc[0, "name"]
+```
+
+---
+
+## Nested JSON
+
+Jednoduchý převod:
+
+```python
+df = pd.DataFrame(data)
+```
+
+Zploštění nested JSON:
+
+```python
+df = pd.json_normalize(data)
+```
+
+Například:
+
+```text
+address
+└── city
+```
+
+může vzniknout jako:
+
+```text
+address.city
+```
+
+---
+
+## Query parameters — `params=`
+
+```python
+url = "https://jsonplaceholder.typicode.com/posts"
+
+params = {
+    "userId": 3
+}
+
+response = requests.get(
+    url,
+    params=params,
+    timeout=10
+)
+```
+
+Kontrola výsledné URL:
+
+```python
+print(response.url)
+```
+
+```text
+params
+→ co chci po API za data
+```
+
+Více parametrů:
+
+```python
+params = {
+    "userId": 3,
+    "id": 21
+}
+```
+
+Stejný klíč nelze ve slovníku uvést dvakrát.
+
+Pokud API podporuje více hodnot stejného parametru:
+
+```python
+params = [
+    ("userId", 1),
+    ("userId", 2)
+]
+```
+
+---
+
+## Headers
+
+```python
+headers = {
+    "Accept": "application/json"
+}
+
+response = requests.get(
+    url,
+    headers=headers,
+    timeout=10
+)
+```
+
+Kontrola odeslaných headers:
+
+```python
+print(response.request.headers)
+```
+
+```text
+params
+→ co chci za data
+
+headers
+→ doplňující informace o requestu
+```
+
+Časté headers:
+
+```text
+Accept
+Authorization
+Content-Type
+User-Agent
+```
+
+---
+
+## API key / Bearer token
+
+API key v headeru:
+
+```python
+headers = {
+    "X-API-Key": "MOJE_API_KEY"
+}
+```
+
+Bearer token:
+
+```python
+headers = {
+    "Authorization": "Bearer MUJ_TOKEN"
+}
+```
+
+Citlivé údaje neukládat natvrdo do kódu publikovaného na GitHubu.
+
+Lepší princip:
+
+```python
+import os
+
+api_key = os.getenv("API_KEY")
+```
+
+---
+
+## HTTP status codes
+
+```text
+200 → OK
+201 → Created
+400 → Bad Request
+401 → Unauthorized
+403 → Forbidden
+404 → Not Found
+429 → Too Many Requests
+500 → Internal Server Error
+```
+
+Automatická kontrola:
+
+```python
+response.raise_for_status()
+```
+
+```text
+úspěch
+→ nic se nestane
+
+HTTP chyba
+→ vyhodí výjimku
+```
+
+---
+
+## `try / except`
+
+```python
+try:
+    response = requests.get(
+        url,
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+except requests.exceptions.RequestException as error:
+    print(
+        "Chyba při komunikaci s API:",
+        error
+    )
+```
+
+```text
+try
+→ zkus provést kód
+
+except
+→ zachyť chybu
+```
+
+`RequestException` zachytí obecně chyby knihovny `requests`.
+
+---
+
+## Timeout
+
+```python
+response = requests.get(
+    url,
+    timeout=10
+)
+```
+
+```text
+timeout
+→ ochrana proti příliš dlouhému čekání requestu
+```
+
+---
+
+## Pagination
+
+Příklad:
+
+```python
+params = {
+    "_page": 1,
+    "_limit": 5
+}
+```
+
+```text
+_page
+→ číslo stránky
+
+_limit
+→ počet záznamů na stránku
+```
+
+Ruční načtení dvou stránek:
+
+```python
+response_1 = requests.get(
+    url,
+    params={"_page": 1, "_limit": 5}
+)
+
+response_2 = requests.get(
+    url,
+    params={"_page": 2, "_limit": 5}
+)
+```
+
+---
+
+## Multi-page loading — `for`
+
+```python
+all_rows = []
+
+for page in range(1, 3):
+    params = {
+        "_page": page,
+        "_limit": 5
+    }
+
+    response = requests.get(
+        url,
+        params=params,
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    all_rows.extend(data)
+
+df = pd.DataFrame(all_rows)
+```
+
+```text
+extend()
+→ přidá jednotlivé záznamy do listu
+
+append()
+→ přidal by celý list jako jeden prvek
+```
+
+---
+
+## Obecnější pagination — `while`
+
+```python
+all_rows = []
+page = 1
+
+while True:
+    params = {
+        "_page": page,
+        "_limit": 5
+    }
+
+    response = requests.get(
+        url,
+        params=params,
+        timeout=10
+    )
+
+    response.raise_for_status()
+
+    data = response.json()
+
+    if not data:
+        break
+
+    all_rows.extend(data)
+
+    page += 1
+
+df = pd.DataFrame(all_rows)
+```
+
+Logika:
+
+```text
+načti stránku
+→ jsou data?
+   ano → přidej je a pokračuj
+   ne  → break
+```
+
+U reálného API může pagination používat také:
+
+```text
+next
+next_page
+has_more
+total_pages
+offset
+limit
+```
+
+Vždy ověř dokumentaci konkrétního API.
+
+---
+
+## API → DataFrame → validation
+
+```python
+df = pd.DataFrame(
+    response.json()
+)
+```
+
+Základní kontrola:
+
+```python
+df.shape
+df.info()
+
+df.isna().sum()
+df.duplicated().sum()
+
+df["id"].nunique()
+df["id"].duplicated().sum()
+```
+
+---
+
+## `len()`, `count()`, `size()` — Pandas vs. SQL
+
+```text
+Pandas                          SQL
+
+len(df)                         COUNT(*)
+
+df["col"].count()               COUNT(col)
+
+df.groupby("x").size()          GROUP BY x
+                                + COUNT(*)
+
+df.groupby("x")["col"].count()  GROUP BY x
+                                + COUNT(col)
+```
+
+Důležité:
+
+```text
+len(df)
+→ počet řádků DataFrame
+
+count()
+→ počet non-null hodnot
+
+size()
+→ počet řádků ve skupině
+```
+
+Příklad:
+
+```python
+summary = (
+    df.groupby(
+        "userId",
+        as_index=False
+    )
+    .size()
+    .rename(
+        columns={
+            "size": "post_count"
+        }
+    )
+)
+```
+
+SQL analogie:
+
+```sql
+SELECT
+    userId,
+    COUNT(*) AS post_count
+FROM posts
+GROUP BY userId;
+```
+
+---
+
+## `max()` vs. `idxmax()`
+
+```python
+df["temperature"].max()
+```
+
+```text
+max()
+→ nejvyšší hodnota
+```
+
+```python
+df["temperature"].idxmax()
+```
+
+```text
+idxmax()
+→ index řádku s nejvyšší hodnotou
+```
+
+Celý řádek s maximem:
+
+```python
+max_row = df.loc[
+    df["temperature"].idxmax()
+]
+```
+
+---
+
+## Co si pamatovat
+
+```text
+requests.get()
+→ GET request
+
+params=
+→ parametry dotazu
+
+headers=
+→ doplňující informace requestu
+
+response.status_code
+→ stav requestu
+
+response.headers
+→ headers odpovědi
+
+response.json()
+→ JSON → Python data
+
+pd.DataFrame()
+→ tabulka
+
+pd.json_normalize()
+→ nested JSON → plochá tabulka
+
+raise_for_status()
+→ HTTP chyba → výjimka
+
+timeout=
+→ limit čekání
+
+extend()
+→ skládání více stránek dat
+
+size()
+→ COUNT(*)
+
+count()
+→ COUNT(column)
+
+max()
+→ maximální hodnota
+
+idxmax()
+→ řádek / index maxima
+```
