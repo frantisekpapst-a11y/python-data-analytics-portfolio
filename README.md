@@ -525,23 +525,3 @@ Git
 GitHub
 VS Code
 ```
-
----
-
-# 📈 Další rozvoj
-
-Python portfolio je dále rozšiřováno především prostřednictvím komplexnějších praktických projektů a integrace s externími datovými zdroji.
-
-Navazující oblasti zahrnují například:
-
-- další API projekty,
-- finanční a tržní data,
-- větší relační datasety,
-- pokročilejší statistickou analýzu,
-- SQL + Python analytické pipeline,
-- přípravu dat pro Power BI,
-- reusable Python functions,
-- robustnější validation a error handling,
-- end-to-end analytické case studies.
-
-Automatizace, kompletní cross-tool analytické workflow a širší data tooling jsou vedeny jako samostatné oblasti mimo čistě Python portfolio.
