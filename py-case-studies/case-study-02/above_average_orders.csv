@@ -1,0 +1,6 @@
+order_id,product,category,quantity,unit_price,customer,total
+1001,Laptop,Electronics,1,24000,ABC Company,24000
+1003,Office Chair,Furniture,4,4800,ABC Company,19200
+1005,Desk,Furniture,2,8500,DataPro,17000
+1009,Desk,Furniture,3,8500,TechSolutions,25500
+1010,Laptop,Electronics,2,24000,DataPro,48000

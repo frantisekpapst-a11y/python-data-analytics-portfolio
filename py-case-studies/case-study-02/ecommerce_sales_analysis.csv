@@ -1,0 +1,11 @@
+order_id,product,category,quantity,unit_price,customer
+1001,Laptop,Electronics,1,24000,ABC Company
+1002,Monitor,Electronics,2,6500,DataPro
+1003,Office Chair,Furniture,4,4800,ABC Company
+1004,Keyboard,Electronics,3,1200,TechSolutions
+1005,Desk,Furniture,2,8500,DataPro
+1006,Mouse,Electronics,5,700,ABC Company
+1007,Office Chair,Furniture,2,4800,TechSolutions
+1008,Monitor,Electronics,1,6500,ABC Company
+1009,Desk,Furniture,3,8500,TechSolutions
+1010,Laptop,Electronics,2,24000,DataPro
