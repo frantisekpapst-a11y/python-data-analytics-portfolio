@@ -29,7 +29,7 @@ Hlavní oblasti:
 ```text
 da-python-portfolio/
 │
-├── case-studies/
+├── py-case-studies/
 │   ├── case-study-01/
 │   ├── case-study-02/
 │   ├── case-study-03/
@@ -37,14 +37,14 @@ da-python-portfolio/
 │   ├── case-study-05/
 │   └── case-study-06/
 │
-├── cheatsheets/
+├── py-cheatsheets/
 │   ├── python_data_analytics_cheatsheet.md
 │   ├── python_data_analytics_libraries.md
 │   └── python_fundamentals_cheatsheet.md
 │
-├── lessons/
+├── py-lessons/
 │
-├── mini-tests/
+├── py-mini-tests/
 │   └── mini_tests.md
 │
 └── README.md
