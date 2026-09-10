@@ -1,4 +1,4 @@
-# 🐍 Python Data Analytics Portfolio
+# 🐍 Data Analytics Python Portfolio
 
 Portfolio zaměřené na **Python, pandas, datovou přípravu, analytické workflow, vizualizaci, práci s API a integraci s dalšími datovými nástroji**.
 
@@ -27,7 +27,7 @@ Hlavní oblasti:
 # 📂 Struktura repozitáře
 
 ```text
-python-data-analytics-portfolio/
+da-python-portfolio/
 │
 ├── case-studies/
 │   ├── case-study-01/
